@@ -50,11 +50,25 @@ function Header() {
         <Link
           to="/"
           className="
-            text-2xl
-            font-bold
-          "
+    flex
+    items-center
+    gap-3
+  "
         >
-          CMC Decor
+          <img
+            src="/logo.png"
+            alt="Woodora"
+            className="w-12 h-12 object-contain"
+          />
+
+          <span
+            className="
+      text-2xl
+      font-bold
+    "
+          >
+            Woodora
+          </span>
         </Link>
 
         {/* Navigation */}
@@ -139,19 +153,19 @@ function Header() {
 
               {user.role ===
                 "admin" && (
-                <Link
-                  to="/admin"
-                  className="
+                  <Link
+                    to="/admin"
+                    className="
                     px-4
                     py-2
                     bg-blue-600
                     text-white
                     rounded
                   "
-                >
-                  Dashboard
-                </Link>
-              )}
+                  >
+                    Dashboard
+                  </Link>
+                )}
 
               <button
                 onClick={
