@@ -63,9 +63,11 @@ function Header() {
 
           <span
             className="
-      text-2xl
-      font-bold
-    "
+    text-3xl
+    font-bold
+    italic
+    tracking-wide
+  "
           >
             Woodora
           </span>
