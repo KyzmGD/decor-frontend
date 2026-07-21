@@ -58,7 +58,7 @@ function Header() {
           <img
             src="/logo.png"
             alt="Woodora"
-            className="w-12 h-12 object-contain"
+            className="w-24 h-24 object-contain"
           />
 
           <span
