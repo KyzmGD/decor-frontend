@@ -139,8 +139,6 @@ function Home() {
               setSelectedCategory
             }
           />
-          <p>Selected: {selectedCategory}</p>
-<p>Products: {products.length}</p>
 
         </div>
 
