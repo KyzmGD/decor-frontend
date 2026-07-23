@@ -87,12 +87,16 @@ function OrderManagement() {
 
     return orders.filter((order) => {
       const customerName =
+        order.recipientName ||
+        order.User?.fullname ||
+        order.User?.name ||
         order.user?.fullname ||
         order.user?.name ||
         order.fullname ||
         "";
 
       const customerEmail =
+        order.User?.email ||
         order.user?.email ||
         order.email ||
         "";
@@ -385,12 +389,16 @@ function OrderManagement() {
               <tbody className="divide-y divide-slate-100">
                 {filteredOrders.map((order) => {
                   const customerName =
+                    order.recipientName ||
+                    order.User?.fullname ||
+                    order.User?.name ||
                     order.user?.fullname ||
                     order.user?.name ||
                     order.fullname ||
                     t("admin.unknownCustomer");
 
                   const customerEmail =
+                    order.User?.email ||
                     order.user?.email ||
                     order.email ||
                     "";
