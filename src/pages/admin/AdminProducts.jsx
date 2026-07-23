@@ -233,7 +233,7 @@ const { t } =
           <button
             type="button"
             onClick={loadData}
-            className="i18n-toolbar-action flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+            className="i18n-toolbar-action flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition hover:border-[#A98252] hover:bg-[#F7F0E6] hover:text-[#7A5A35] dark:border-stone-700 dark:text-stone-300 dark:hover:border-[#C5A26B] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
           >
             <RefreshCcw size={18} />
             {t("common.refresh")}
@@ -306,7 +306,7 @@ const { t } =
             <button
               type="button"
               onClick={handleCancel}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-[#F7F0E6] hover:text-[#7A5A35] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
             >
               {t("common.close")}
             </button>

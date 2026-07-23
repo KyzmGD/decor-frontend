@@ -53,9 +53,11 @@ function CategoryList({
             <tr
                 key={category.id}
   className="
-    transition
-    hover:bg-slate-50
-    dark:hover:bg-slate-800/60
+    transition-colors
+    duration-200
+    hover:bg-[#F7F0E6]
+    hover:shadow-[inset_3px_0_0_#A98252]
+    dark:hover:bg-[#2B241F]
   "
             >
               <td className="px-6 py-4">
@@ -102,9 +104,14 @@ function CategoryList({
                       bg-white
                       text-slate-600
                       transition
-                      hover:border-amber-300
-                      hover:bg-amber-50
-                      hover:text-amber-800
+                      hover:border-[#A98252]
+                      hover:bg-[#F1E6D7]
+                      hover:text-[#7A5A35]
+                      dark:border-stone-700
+                      dark:text-stone-300
+                      dark:hover:border-[#C5A26B]
+                      dark:hover:bg-[#2B241F]
+                      dark:hover:text-[#C5A26B]
                       focus:outline-none
                       focus:ring-2
                       focus:ring-amber-200
@@ -130,9 +137,14 @@ function CategoryList({
                       bg-white
                       text-slate-600
                       transition
-                      hover:border-red-200
+                      hover:border-red-300
                       hover:bg-red-50
-                      hover:text-red-600
+                      hover:text-red-700
+                      dark:border-stone-700
+                      dark:text-stone-300
+                      dark:hover:border-red-700
+                      dark:hover:bg-red-950/40
+                      dark:hover:text-red-300
                       focus:outline-none
                       focus:ring-2
                       focus:ring-red-200

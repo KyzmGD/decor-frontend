@@ -30,6 +30,7 @@ import LanguageContext from "../context/LanguageContext";
 import WishlistContext from "../context/WishlistContext";
 import MainLayout from "../layouts/MainLayout";
 import ProductCard from "../components/ProductCard";
+import { formatCurrency } from "../utils/currency";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -281,7 +282,7 @@ function ProductDetail() {
               {product.name}
             </h1>
             <p className="mt-5 text-3xl font-bold text-[#A98252]">
-              ${product.price}
+              {formatCurrency(product.price)}
             </p>
 
             <div className="mt-6 flex items-center gap-2">

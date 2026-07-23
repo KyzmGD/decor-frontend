@@ -5,13 +5,14 @@ import {
 } from "lucide-react";
 import { useContext } from "react";
 import LanguageContext from "../../context/LanguageContext";
+import { formatCurrency } from "../../utils/currency";
 
 function ProductList({
   products,
   onEdit,
   onDelete
 }) {
-  const { t, language } = useContext(LanguageContext);
+  const { t } = useContext(LanguageContext);
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full">
@@ -43,7 +44,7 @@ function ProductList({
           {products.map((product) => (
             <tr
               key={product.id}
-              className="transition hover:bg-slate-50"
+              className="transition-colors duration-200 hover:bg-[#F7F0E6] hover:shadow-[inset_3px_0_0_#A98252] dark:hover:bg-[#2B241F]"
             >
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4">
@@ -80,10 +81,7 @@ function ProductList({
               </td>
 
               <td className="px-6 py-4 font-semibold text-slate-900">
-                {Number(product.price || 0).toLocaleString(
-                  language === "vi" ? "vi-VN" : "en-US"
-                )}{" "}
-                ₫
+                {formatCurrency(product.price)}
               </td>
 
               <td className="px-6 py-4">
@@ -104,7 +102,7 @@ function ProductList({
                   <button
                     type="button"
                     onClick={() => onEdit(product)}
-                    className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800"
+                    className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-[#A98252] hover:bg-[#F1E6D7] hover:text-[#7A5A35] dark:border-stone-700 dark:text-stone-300 dark:hover:border-[#C5A26B] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
                     title={t("common.edit")}
                   >
                     <Pencil size={17} />
@@ -113,7 +111,7 @@ function ProductList({
                   <button
                     type="button"
                     onClick={() => onDelete(product.id)}
-                    className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                    className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-red-300 hover:bg-red-50 hover:text-red-700 dark:border-stone-700 dark:text-stone-300 dark:hover:border-red-700 dark:hover:bg-red-950/40 dark:hover:text-red-300"
                     title={t("common.delete")}
                   >
                     <Trash2 size={17} />

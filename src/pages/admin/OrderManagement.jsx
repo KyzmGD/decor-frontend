@@ -17,12 +17,33 @@ import {
 import AuthContext from "../../context/AuthContext";
 import LanguageContext from "../../context/LanguageContext";
 import AdminLayout from "../../layouts/AdminLayout";
+import { formatCurrency } from "../../utils/currency";
 
 import {
   getAllOrders,
   updateOrderStatus,
   confirmLowStockOrder
 } from "../../api/orderApi";
+
+const ORDER_STATUSES = [
+  "Pending",
+  "Confirmed",
+  "Preparing",
+  "Shipping",
+  "Delivered",
+  "Completed",
+  "Cancelled"
+];
+
+const ADMIN_TRANSITIONS = {
+  Pending: ["Confirmed", "Cancelled"],
+  Confirmed: ["Preparing", "Cancelled"],
+  Preparing: ["Shipping", "Cancelled"],
+  Shipping: ["Delivered"],
+  Delivered: [],
+  Completed: [],
+  Cancelled: []
+};
 
 function OrderManagement() {
   const { token } = useContext(AuthContext);
@@ -171,11 +192,17 @@ function OrderManagement() {
       case "pending":
         return "bg-amber-50 text-amber-700";
 
-      case "processing":
+      case "confirmed":
         return "bg-amber-50 text-amber-800";
+
+      case "preparing":
+        return "bg-orange-50 text-orange-700";
 
       case "shipping":
         return "bg-stone-200 text-stone-700";
+
+      case "delivered":
+        return "bg-sky-50 text-sky-700";
 
       case "completed":
         return "bg-emerald-50 text-emerald-700";
@@ -193,11 +220,17 @@ function OrderManagement() {
       case "pending":
         return t("admin.pending");
 
-      case "processing":
+      case "confirmed":
         return t("admin.confirmed");
+
+      case "preparing":
+        return t("admin.preparing");
 
       case "shipping":
         return t("admin.shipping");
+
+      case "delivered":
+        return t("admin.delivered");
 
       case "completed":
         return t("admin.completed");
@@ -249,12 +282,20 @@ function OrderManagement() {
               {t("admin.pending")}
             </option>
 
-            <option value="Processing">
+            <option value="Confirmed">
               {t("admin.confirmed")}
+            </option>
+
+            <option value="Preparing">
+              {t("admin.preparing")}
             </option>
 
             <option value="Shipping">
               {t("admin.shipping")}
+            </option>
+
+            <option value="Delivered">
+              {t("admin.delivered")}
             </option>
 
             <option value="Completed">
@@ -270,7 +311,7 @@ function OrderManagement() {
         <button
           type="button"
           onClick={loadOrders}
-          className="i18n-toolbar-action flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+          className="i18n-toolbar-action flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition hover:border-[#A98252] hover:bg-[#F7F0E6] hover:text-[#7A5A35] dark:border-stone-700 dark:text-stone-300 dark:hover:border-[#C5A26B] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
         >
           <RefreshCcw size={18} />
           {t("common.refresh")}
@@ -367,13 +408,16 @@ function OrderManagement() {
                   const lowStockItems =
                     order.OrderItems?.filter(
                       (item) =>
-                        Number(item.Product?.stock) < 4
+                        Number(item.Product?.stock) <= 5
                     ) || [];
+
+                  const allowedNextStatuses =
+                    ADMIN_TRANSITIONS[order.status] || [];
 
                   return (
                     <tr
                       key={order.id}
-                      className="transition hover:bg-slate-50"
+                      className="transition-colors duration-200 hover:bg-[#F7F0E6] hover:shadow-[inset_3px_0_0_#A98252] dark:hover:bg-[#2B241F]"
                     >
                       <td className="px-6 py-4">
                         <span className="font-semibold text-slate-900">
@@ -413,10 +457,7 @@ function OrderManagement() {
                       </td>
 
                       <td className="px-6 py-4 font-semibold text-slate-900">
-                        {Number(total).toLocaleString(
-                          language === "vi" ? "vi-VN" : "en-US"
-                        )}{" "}
-                        ₫
+                        {formatCurrency(total)}
                       </td>
 
                       <td className="px-6 py-4">
@@ -449,7 +490,7 @@ function OrderManagement() {
                               onClick={() =>
                                 handleLowStockConfirmation(order.id)
                               }
-                              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-700 disabled:opacity-50"
+                              className="inline-flex items-center gap-2 rounded-lg bg-[#A98252] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#7A5A35] hover:shadow-md disabled:opacity-50"
                             >
                               <ShieldCheck size={17} />
                               {confirmingId === order.id
@@ -472,39 +513,29 @@ function OrderManagement() {
                             }
                             className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-900"
                           >
-                            <option value="Pending">
-                              {t("admin.pending")}
-                            </option>
-
-                            <option
-                              value="Processing"
-                              disabled={needsConfirmation}
-                            >
-                              {t("admin.confirmed")}
-                            </option>
-
-                            <option
-                              value="Shipping"
-                              disabled={needsConfirmation}
-                            >
-                              {t("admin.shipping")}
-                            </option>
-
-                            <option
-                              value="Completed"
-                              disabled={needsConfirmation}
-                            >
-                              {t("admin.completed")}
-                            </option>
-
-                            <option value="Cancelled">
-                              {t("admin.cancelled")}
-                            </option>
+                            {ORDER_STATUSES.map((status) => (
+                              <option
+                                key={status}
+                                value={status}
+                                disabled={
+                                  status !== order.status &&
+                                  (
+                                    !allowedNextStatuses.includes(status) ||
+                                    (
+                                      needsConfirmation &&
+                                      status === "Confirmed"
+                                    )
+                                  )
+                                }
+                              >
+                                {getStatusLabel(status)}
+                              </option>
+                            ))}
                           </select>
 
                           <button
                             type="button"
-                            className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800"
+                            className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-[#A98252] hover:bg-[#F1E6D7] hover:text-[#7A5A35] dark:border-stone-700 dark:text-stone-300 dark:hover:border-[#C5A26B] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
                             title={t("admin.viewDetails")}
                           >
                             <Eye size={17} />

@@ -184,10 +184,11 @@ function AdminCategories() {
     font-semibold
     text-white
     transition
-    hover:bg-slate-800
+    hover:bg-[#453A32]
+    hover:shadow-md
     dark:bg-white
     dark:text-slate-900
-    dark:hover:bg-slate-200
+    dark:hover:bg-[#BD996B]
   "
 >
   <Plus size={18} />
@@ -216,7 +217,7 @@ function AdminCategories() {
                 setShowForm(false);
                 setSelectedCategory(null);
               }}
-              className="rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-100"
+              className="rounded-lg px-3 py-2 text-sm text-slate-500 transition hover:bg-[#F7F0E6] hover:text-[#7A5A35] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
             >
               {t("common.close")}
             </button>

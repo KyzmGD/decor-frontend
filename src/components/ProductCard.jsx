@@ -9,6 +9,7 @@ import {
 import AuthContext from "../context/AuthContext";
 import LanguageContext from "../context/LanguageContext";
 import WishlistContext from "../context/WishlistContext";
+import { formatCurrency } from "../utils/currency";
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -117,7 +118,7 @@ function ProductCard({ product }) {
             {product.name}
           </h3>
           <p className="mt-2 text-xl font-bold text-[#A98252]">
-            ${product.price}
+            {formatCurrency(product.price)}
           </p>
         </div>
       </Link>

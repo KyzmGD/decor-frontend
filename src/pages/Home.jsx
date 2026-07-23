@@ -191,43 +191,69 @@ function Home() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.slice(0, 6).map((category, index) => (
-              <Link
-                key={category.id}
-                to="/products"
-                className="
-                  group
-                  flex
-                  min-h-28
-                  items-end
-                  justify-between
-                  rounded-2xl
-                  border
-                  border-stone-200
-                  bg-white
-                  p-5
-                  shadow-sm
-                  hover:-translate-y-1
-                  hover:border-[#A98252]
-                  hover:shadow-md
-                  dark:border-stone-700
-                  dark:bg-stone-900
-                "
-              >
-                <div>
-                  <span className="text-xs text-stone-400">
-                    0{index + 1}
-                  </span>
-                  <h3 className="mt-2 font-semibold">
-                    {category.name}
-                  </h3>
-                </div>
-                <ArrowRight
-                  size={18}
-                  className="text-stone-400 transition group-hover:translate-x-1 group-hover:text-[#A98252]"
-                />
-              </Link>
-            ))}
+            {categories.slice(0, 6).map((category, index) => {
+              const categoryProduct = products.find(
+                (product) =>
+                  Number(product.categoryId) ===
+                  Number(category.id)
+              );
+              const categoryImage =
+                category.image ||
+                categoryProduct?.image ||
+                "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace";
+
+              return (
+                <Link
+                  key={category.id}
+                  to="/products"
+                  className="
+                    group
+                    relative
+                    min-h-48
+                    overflow-hidden
+                    rounded-2xl
+                    border
+                    border-stone-200
+                    shadow-sm
+                    hover:-translate-y-1
+                    hover:border-[#A98252]
+                    hover:shadow-lg
+                    dark:border-stone-700
+                  "
+                >
+                  <img
+                    src={categoryImage}
+                    alt={category.name}
+                    loading="lazy"
+                    className="
+                      absolute
+                      inset-0
+                      h-full
+                      w-full
+                      object-cover
+                      transition
+                      duration-500
+                      group-hover:scale-105
+                    "
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/5" />
+                  <div className="relative flex min-h-48 items-end justify-between p-5 text-white">
+                    <div>
+                      <span className="text-xs text-stone-300">
+                        0{index + 1}
+                      </span>
+                      <h3 className="mt-2 text-lg font-semibold">
+                        {category.name}
+                      </h3>
+                    </div>
+                    <ArrowRight
+                      size={19}
+                      className="transition group-hover:translate-x-1 group-hover:text-[#D9BA8C]"
+                    />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       </div>

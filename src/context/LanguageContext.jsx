@@ -136,7 +136,13 @@ const translations = {
         "Đã xác nhận",
 
       shipping:
-        "Đang giao",
+        "Đang giao hàng",
+
+      preparing:
+        "Đang chuẩn bị hàng",
+
+      delivered:
+        "Đã giao",
 
       completed:
         "Hoàn thành",
@@ -168,7 +174,7 @@ const translations = {
       deleteCategoryError: "Không thể xóa danh mục.",
       loadOrdersError: "Không thể tải danh sách đơn hàng.",
       updateOrderError: "Không thể cập nhật trạng thái đơn hàng."
-      ,lowStockWarning: "Đơn có sản phẩm tồn kho dưới 4",
+      ,lowStockWarning: "Đơn có sản phẩm tồn kho từ 5 trở xuống",
       confirmOrder: "Xác nhận đơn",
       confirmLowStockPrompt: "Sản phẩm đang có tồn kho thấp. Bạn xác nhận vẫn xử lý đơn hàng này?",
       confirmLowStockError: "Không thể xác nhận đơn hàng tồn kho thấp."
@@ -301,7 +307,15 @@ const translations = {
       defaultShippingAddress: "Địa chỉ giao hàng mặc định",
       checkoutAutofillHint: "Thông tin này sẽ được tự động điền khi bạn thanh toán.",
       profileUpdated: "Cập nhật hồ sơ thành công",
-      profileUpdateError: "Không thể cập nhật hồ sơ"
+      profileUpdateError: "Không thể cập nhật hồ sơ",
+      cancelOrder: "Hủy đơn hàng",
+      cancelOrderPrompt: "Bạn có chắc muốn hủy đơn hàng này?",
+      orderCancelled: "Đã hủy đơn hàng",
+      cancelOrderError: "Không thể hủy đơn hàng",
+      receivedOrder: "Đã nhận được hàng",
+      receivedOrderPrompt: "Bạn xác nhận đã nhận đầy đủ đơn hàng?",
+      orderCompleted: "Cảm ơn bạn đã xác nhận nhận hàng",
+      confirmReceivedError: "Không thể xác nhận đã nhận hàng"
     }
   },
 
@@ -447,6 +461,12 @@ const translations = {
       shipping:
         "Shipping",
 
+      preparing:
+        "Preparing",
+
+      delivered:
+        "Delivered",
+
       completed:
         "Completed",
 
@@ -477,7 +497,7 @@ const translations = {
       deleteCategoryError: "Unable to delete the category.",
       loadOrdersError: "Unable to load orders.",
       updateOrderError: "Unable to update the order status."
-      ,lowStockWarning: "Order contains products with stock below 4",
+      ,lowStockWarning: "Order contains products with stock of 5 or less",
       confirmOrder: "Confirm order",
       confirmLowStockPrompt: "Some products have low stock. Do you want to confirm and process this order?",
       confirmLowStockError: "Unable to confirm the low-stock order."
@@ -610,7 +630,15 @@ const translations = {
       defaultShippingAddress: "Default shipping address",
       checkoutAutofillHint: "These details will be filled in automatically during checkout.",
       profileUpdated: "Profile updated successfully",
-      profileUpdateError: "Unable to update profile"
+      profileUpdateError: "Unable to update profile",
+      cancelOrder: "Cancel order",
+      cancelOrderPrompt: "Are you sure you want to cancel this order?",
+      orderCancelled: "Order cancelled",
+      cancelOrderError: "Unable to cancel the order",
+      receivedOrder: "Order received",
+      receivedOrderPrompt: "Have you received the complete order?",
+      orderCompleted: "Thank you for confirming delivery",
+      confirmReceivedError: "Unable to confirm order receipt"
     }
   }
 };

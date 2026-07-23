@@ -4,6 +4,7 @@ import {
 
 import CartContext
   from "../context/CartContext";
+import { formatCurrency } from "../utils/currency";
 
 function Cart() {
 
@@ -51,8 +52,7 @@ function Cart() {
             </h3>
 
             <p>
-              $
-              {item.price}
+              {formatCurrency(item.price)}
             </p>
 
           </div>
@@ -101,8 +101,7 @@ function Cart() {
       ))}
 
       <h2 className="text-2xl font-bold mt-6">
-        Total: $
-        {total.toFixed(2)}
+        Total: {formatCurrency(total)}
       </h2>
 
     </div>

@@ -52,3 +52,19 @@ export const confirmLowStockOrder =
       {},
       getConfig(token)
     );
+
+export const cancelMyOrder =
+  (id, token) =>
+    axios.patch(
+      `${API_URL}/${id}/cancel`,
+      {},
+      getConfig(token)
+    );
+
+export const confirmOrderReceived =
+  (id, token) =>
+    axios.patch(
+      `${API_URL}/${id}/received`,
+      {},
+      getConfig(token)
+    );

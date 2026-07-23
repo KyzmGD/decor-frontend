@@ -11,14 +11,18 @@ import {
 import AdminLayout from "../../layouts/AdminLayout";
 import { getProducts } from "../../api/adminProductApi";
 import { getCategories } from "../../api/categoryApi";
+import { getAllOrders } from "../../api/orderApi";
 import {
   useContext
 } from "react";
 
 import LanguageContext
   from "../../context/LanguageContext";
+import AuthContext from "../../context/AuthContext";
+import { formatCurrency } from "../../utils/currency";
 function AdminDashboard() {
-  const { t, language } = useContext(LanguageContext);
+  const { t } = useContext(LanguageContext);
+  const { token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -34,14 +38,17 @@ function AdminDashboard() {
 
       const [
         productResponse,
-        categoryResponse
+        categoryResponse,
+        orderResponse
       ] = await Promise.all([
         getProducts(),
-        getCategories()
+        getCategories(),
+        getAllOrders(token)
       ]);
 
       setProducts(productResponse.data || []);
       setCategories(categoryResponse.data || []);
+      setOrders(orderResponse.data || []);
 
     } catch (error) {
       console.error("Load dashboard failed:", error);
@@ -51,14 +58,16 @@ function AdminDashboard() {
   };
 
   const revenue = useMemo(() => {
-    return orders.reduce((total, order) => {
+    return orders
+      .filter((order) => order.status === "Completed")
+      .reduce((total, order) => {
       return total + Number(
         order.totalPrice ||
         order.totalAmount ||
         order.total ||
         0
       );
-    }, 0);
+      }, 0);
   }, [orders]);
 
   const statistics = [
@@ -87,10 +96,7 @@ function AdminDashboard() {
     label: t(
       "admin.revenue"
     ),
-    value:
-      revenue.toLocaleString(
-        language === "vi" ? "vi-VN" : "en-US"
-      ) + " ₫",
+    value: formatCurrency(revenue),
     icon: DollarSign
   }
 ];
