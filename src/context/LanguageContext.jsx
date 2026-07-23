@@ -315,7 +315,19 @@ const translations = {
       receivedOrder: "Đã nhận được hàng",
       receivedOrderPrompt: "Bạn xác nhận đã nhận đầy đủ đơn hàng?",
       orderCompleted: "Cảm ơn bạn đã xác nhận nhận hàng",
-      confirmReceivedError: "Không thể xác nhận đã nhận hàng"
+      confirmReceivedError: "Không thể xác nhận đã nhận hàng",
+      filters: "Bộ lọc",
+      resetFilters: "Đặt lại bộ lọc",
+      priceRange: "Khoảng giá (USD)",
+      minimum: "Từ",
+      maximum: "Đến",
+      minimumRating: "Đánh giá tối thiểu",
+      anyRating: "Tất cả đánh giá",
+      inStockOnly: "Chỉ hiển thị sản phẩm còn hàng",
+      newest: "Mới nhất",
+      bestRated: "Đánh giá cao nhất",
+      nameAZ: "Tên A–Z",
+      resultCount: "{count} sản phẩm"
     }
   },
 
@@ -638,7 +650,19 @@ const translations = {
       receivedOrder: "Order received",
       receivedOrderPrompt: "Have you received the complete order?",
       orderCompleted: "Thank you for confirming delivery",
-      confirmReceivedError: "Unable to confirm order receipt"
+      confirmReceivedError: "Unable to confirm order receipt",
+      filters: "Filters",
+      resetFilters: "Reset filters",
+      priceRange: "Price range (USD)",
+      minimum: "Min",
+      maximum: "Max",
+      minimumRating: "Minimum rating",
+      anyRating: "Any rating",
+      inStockOnly: "In-stock products only",
+      newest: "Newest",
+      bestRated: "Best rated",
+      nameAZ: "Name A–Z",
+      resultCount: "{count} products"
     }
   }
 };

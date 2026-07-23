@@ -1,5 +1,8 @@
 import { useContext } from "react";
-import { Heart } from "lucide-react";
+import {
+  Heart,
+  Star
+} from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Link,
@@ -10,6 +13,7 @@ import AuthContext from "../context/AuthContext";
 import LanguageContext from "../context/LanguageContext";
 import WishlistContext from "../context/WishlistContext";
 import { formatCurrency } from "../utils/currency";
+import { getProductReviewSummary } from "../utils/reviews";
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -22,6 +26,8 @@ function ProductCard({ product }) {
 
   const isFavorite =
     Boolean(user) && isInWishlist(product.id);
+  const reviewSummary =
+    getProductReviewSummary(product);
 
   const handleWishlist = () => {
     if (!user) {
@@ -75,8 +81,8 @@ function ProductCard({ product }) {
           top-3
           z-10
           flex
-          h-10
-          w-10
+          h-9
+          w-9
           items-center
           justify-center
           rounded-full
@@ -91,7 +97,7 @@ function ProductCard({ product }) {
         `}
       >
         <Heart
-          size={19}
+          size={17}
           fill={isFavorite ? "currentColor" : "none"}
         />
         </button>
@@ -103,7 +109,7 @@ function ProductCard({ product }) {
             src={product.image}
             alt={product.name}
             className="
-              h-80
+              h-56
               w-full
               object-cover
               transition
@@ -113,11 +119,24 @@ function ProductCard({ product }) {
           />
         </div>
 
-        <div className="p-5">
-          <h3 className="line-clamp-1 text-lg font-semibold">
+        <div className="p-4">
+          <h3 className="line-clamp-1 text-base font-semibold">
             {product.name}
           </h3>
-          <p className="mt-2 text-xl font-bold text-[#A98252]">
+          <div className="mt-2 flex items-center gap-1.5 text-xs">
+            <Star
+              size={14}
+              fill="currentColor"
+              className="text-[#A98252]"
+            />
+            <span className="font-semibold">
+              {reviewSummary.rating.toFixed(1)}
+            </span>
+            <span className="text-stone-400">
+              ({reviewSummary.count} {t("user.reviews")})
+            </span>
+          </div>
+          <p className="mt-2 text-lg font-bold text-[#A98252]">
             {formatCurrency(product.price)}
           </p>
         </div>
