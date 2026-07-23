@@ -33,11 +33,17 @@ import Register
 import Cart
   from "./pages/Cart";
 
+import MyOrders
+  from "./pages/MyOrders";
+
 import Profile
   from "./pages/Profile";
 
 import AdminDashboard
   from "./pages/admin/AdminDashboard";
+
+import OrderManagement
+  from "./pages/admin/OrderManagement";
 
 import PrivateRoute
   from "./components/PrivateRoute";
@@ -45,13 +51,17 @@ import PrivateRoute
 import AdminRoute
   from "./components/AdminRoute";
 
+import Checkout
+  from "./pages/Checkout";
+
 function App() {
 
   const {
-    user
-  } = useContext(
-    AuthContext
-  );
+  user,
+  loading
+} = useContext(
+  AuthContext
+);
 
   return (
 
@@ -82,6 +92,7 @@ function App() {
         element={
           <PrivateRoute
             user={user}
+            loading={loading}
           >
             <Profile />
           </PrivateRoute>
@@ -93,11 +104,23 @@ function App() {
         element={
           <PrivateRoute
             user={user}
+            loading={loading}
           >
             <Cart />
           </PrivateRoute>
         }
       />
+      <Route
+  path="/my-orders"
+  element={
+    <PrivateRoute
+      user={user}
+      loading={loading}
+    >
+      <MyOrders />
+    </PrivateRoute>
+  }
+/>
 
       <Route
         path="/admin"
@@ -109,6 +132,16 @@ function App() {
           </AdminRoute>
         }
       />
+      <Route
+  path="/admin/orders"
+  element={
+    <AdminRoute
+      user={user}
+    >
+      <OrderManagement />
+    </AdminRoute>
+  }
+/>
 <Route
   path="/admin/products"
   element={
@@ -134,6 +167,16 @@ function App() {
     <AdminRoute user={user}>
       <ProductEdit />
     </AdminRoute>
+  }
+/>
+<Route
+  path="/checkout"
+  element={
+    <PrivateRoute
+    user={user}>
+    loading={loading}
+      <Checkout />
+    </PrivateRoute>
   }
 />
     </Routes>

@@ -33,6 +33,13 @@ import ProductForm
 import ProductList
   from "../../components/admin/ProductList";
 
+import MainLayout
+  from "../../layouts/MainLayout";
+
+import {
+  Link
+} from "react-router-dom";
+
 function AdminDashboard() {
 
   const { token } =
@@ -186,6 +193,7 @@ function AdminDashboard() {
     };
 
   return (
+   <MainLayout>
     <div
       className="
         max-w-7xl
@@ -203,7 +211,28 @@ function AdminDashboard() {
       >
         Admin Dashboard
       </h1>
+      <div
+  className="
+    mb-6
+    flex
+    gap-4
+  "
+>
 
+  <Link
+    to="/admin/orders"
+    className="
+      bg-black
+      text-white
+      px-4
+      py-2
+      rounded
+    "
+  >
+    Orders
+  </Link>
+
+</div>
       <div
         className="
           flex
@@ -302,6 +331,7 @@ function AdminDashboard() {
       )}
 
     </div>
+  </MainLayout> 
   );
 }
 

@@ -10,6 +10,9 @@ import {
 import AuthContext
   from "../context/AuthContext";
 
+import CartContext
+  from "../context/CartContext";
+
 function Header() {
 
   const {
@@ -18,10 +21,20 @@ function Header() {
   } = useContext(
     AuthContext
   );
+const {
+  cartItems
+} = useContext(
+  CartContext
+);
 
   const navigate =
     useNavigate();
-
+const cartCount =
+  cartItems.reduce(
+    (sum, item) =>
+      sum + item.quantity,
+    0
+  );
   const handleLogout = () => {
 
     logout();
@@ -87,18 +100,23 @@ function Header() {
             Home
           </Link>
 
-          <Link to="/">
-            Products
-          </Link>
+          <Link to="/products">
+  Products
+</Link>
 
           {user && (
             <>
               <Link to="/cart">
-                Cart
-              </Link>
+  Cart ({cartCount})
+</Link>
 
               <Link to="/profile">
                 Profile
+              </Link>
+              <Link
+                to="/my-orders"
+              >
+                My Orders
               </Link>
             </>
           )}
@@ -154,20 +172,44 @@ function Header() {
               </span>
 
               {user.role ===
-                "admin" && (
-                  <Link
-                    to="/admin"
-                    className="
-                    px-4
-                    py-2
-                    bg-blue-600
-                    text-white
-                    rounded
-                  "
-                  >
-                    Dashboard
-                  </Link>
-                )}
+  "admin" && (
+
+  <div
+    className="
+      flex
+      gap-2
+    "
+  >
+
+    <Link
+      to="/admin"
+      className="
+        px-4
+        py-2
+        bg-blue-600
+        text-white
+        rounded
+      "
+    >
+      Dashboard
+    </Link>
+
+    <Link
+      to="/admin/orders"
+      className="
+        px-4
+        py-2
+        bg-green-600
+        text-white
+        rounded
+      "
+    >
+      Orders
+    </Link>
+
+  </div>
+
+)}
 
               <button
                 onClick={

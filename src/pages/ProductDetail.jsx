@@ -1,14 +1,29 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+  useContext
+} from "react";
 
-import MainLayout from "../layouts/MainLayout";
+import { useParams }
+  from "react-router-dom";
 
-import { getProductById }
-  from "../api/productApi";
+import MainLayout
+  from "../layouts/MainLayout";
+
+import {
+  getProductById
+} from "../api/productApi";
+
+import CartContext
+  from "../context/CartContext";
 
 function ProductDetail() {
 
-  const { id } = useParams();
+  const { id } =
+    useParams();
+console.log(useContext(CartContext));
+  const { addToCart } =
+    useContext(CartContext);
 
   const [product, setProduct] =
     useState(null);
@@ -17,16 +32,14 @@ function ProductDetail() {
     loadProduct();
   }, []);
 
-  const loadProduct = async () => {
-    try {
+  const loadProduct =
+    async () => {
+
       const response =
         await getProductById(id);
 
       setProduct(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    };
 
   if (!product) {
     return <p>Loading...</p>;
@@ -53,6 +66,24 @@ function ProductDetail() {
         <p className="mt-4">
           {product.description}
         </p>
+
+        <button
+          onClick={() =>{
+            console.log("clicked");
+            addToCart(product)
+          }
+          }
+          className="
+            mt-6
+            bg-black
+            text-white
+            px-6
+            py-3
+            rounded
+          "
+        >
+          Add To Cart
+        </button>
 
       </div>
     </MainLayout>
