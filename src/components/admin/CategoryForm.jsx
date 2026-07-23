@@ -1,12 +1,15 @@
 import {
+  useContext,
   useState,
   useEffect
 } from "react";
+import LanguageContext from "../../context/LanguageContext";
 
 function CategoryForm({
   selectedCategory,
   onSubmit
 }) {
+  const { t } = useContext(LanguageContext);
 
   const [name, setName] =
     useState("");
@@ -66,7 +69,7 @@ function CategoryForm({
 
       <input
         type="text"
-        placeholder="Category Name"
+        placeholder={t("common.name")}
         value={name}
         onChange={(e) =>
           setName(
@@ -82,7 +85,7 @@ function CategoryForm({
       />
 
       <textarea
-        placeholder="Description"
+        placeholder={t("common.description")}
         value={description}
         onChange={(e) =>
           setDescription(
@@ -107,8 +110,8 @@ function CategoryForm({
         "
       >
         {selectedCategory
-          ? "Update Category"
-          : "Create Category"}
+          ? `${t("common.update")} ${t("common.categories")}`
+          : `${t("common.create")} ${t("common.categories")}`}
       </button>
 
     </form>

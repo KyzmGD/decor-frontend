@@ -13,8 +13,10 @@ import MainLayout
 import {
   getMyOrders
 } from "../api/orderApi";
+import LanguageContext from "../context/LanguageContext";
 
 function MyOrders() {
+  const { t } = useContext(LanguageContext);
 
   const { token } =
     useContext(
@@ -73,13 +75,13 @@ function MyOrders() {
             mb-8
           "
         >
-          My Orders
+          {t("user.myOrders")}
         </h1>
 
         {orders.length === 0 ? (
 
           <p>
-            No orders found
+            {t("user.noOrders")}
           </p>
 
         ) : (
@@ -106,7 +108,7 @@ function MyOrders() {
                 >
 
                   <h2>
-                    Order #
+                    {t("user.order")} #
                     {order.id}
                   </h2>
 
@@ -117,18 +119,18 @@ function MyOrders() {
                 </div>
 
                 <p>
-                  Total:
+                  {t("common.total")}:
                   $
                   {order.totalPrice}
                 </p>
 
                 <p>
-                  Address:
+                  {t("common.address")}:
                   {order.address}
                 </p>
 
                 <p>
-                  Phone:
+                  {t("common.phone")}:
                   {order.phone}
                 </p>
                 <div
@@ -143,7 +145,7 @@ function MyOrders() {
       mb-2
     "
   >
-    Products
+    {t("user.productsInOrder")}
   </h3>
 
   {order.OrderItems?.map(
@@ -155,7 +157,7 @@ function MyOrders() {
 
         {item.Product?.name}
         {" - "}
-        Qty:
+        {t("common.quantity")}:
         {item.quantity}
 
       </div>

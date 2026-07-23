@@ -4,8 +4,11 @@ import {
 
 import AuthContext
   from "../context/AuthContext";
+import LanguageContext from "../context/LanguageContext";
+import MainLayout from "../layouts/MainLayout";
 
 function Profile() {
+  const { t } = useContext(LanguageContext);
 
   const {
     user
@@ -14,7 +17,7 @@ function Profile() {
   );
 
   return (
-    <div
+    <MainLayout><div
       className="
         max-w-4xl
         mx-auto
@@ -28,28 +31,28 @@ function Profile() {
           mb-6
         "
       >
-        Profile
+        {t("common.profile")}
       </h1>
 
       <p>
-        Name:
+        {t("common.name")}:
         {" "}
         {user?.fullname}
       </p>
 
       <p>
-        Email:
+        {t("common.email")}:
         {" "}
         {user?.email}
       </p>
 
       <p>
-        Role:
+        {t("common.role")}:
         {" "}
         {user?.role}
       </p>
 
-    </div>
+    </div></MainLayout>
   );
 }
 

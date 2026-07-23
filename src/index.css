@@ -1,13 +1,263 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  color-scheme: light;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --color-canvas: #f5f1ea;
+  --color-surface: #fffdf9;
+  --color-ink: #1f1b18;
+  --color-muted: #6f6258;
+  --color-brand: #2b241f;
+  --color-brand-hover: #453a32;
+  --color-accent: #a98252;
+  --color-border: #ded6cb;
+}
+
+html.dark {
+  color-scheme: dark;
+  --color-canvas: #151210;
+  --color-surface: #211c18;
+  --color-ink: #f5f1ea;
+  --color-muted: #bfb4a8;
+  --color-brand: #a98252;
+  --color-brand-hover: #bd996b;
+  --color-accent: #c5a26b;
+  --color-border: #493f36;
+}
 
 body {
-  font-family:
-    "Poppins",
-    sans-serif;
-  background:
-    #F8F5F2;
-  color:
-    #2D2D2D;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+html.dark body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+body {
+  background: var(--color-canvas);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+button,
+select,
+label,
+nav {
+  letter-spacing: -0.01em;
+}
+
+input,
+textarea {
+  letter-spacing: 0;
+}
+
+small,
+th,
+.text-xs {
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+/* Reserve space for translated labels so switching language does not move
+   neighboring components. */
+.i18n-nav-item {
+  display: inline-flex;
+  min-width: 6.5rem;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.i18n-action {
+  display: inline-flex;
+  min-width: 6.75rem;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.i18n-toolbar-action {
+  min-width: 9.5rem;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.i18n-heading-slot {
+  min-height: 3.5rem;
+}
+
+.i18n-card-label {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: flex-start;
+}
+
+.i18n-line-slot {
+  min-height: 1.5rem;
+}
+
+@media (max-width: 639px) {
+  .i18n-action {
+    min-width: 5.25rem;
+  }
+
+  .i18n-toolbar-action {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}
+
+/* Brand palette for legacy utility classes used throughout the storefront. */
+.bg-black,
+.bg-slate-900 {
+  background-color: var(--color-brand);
+}
+
+.bg-white\/95 {
+  background-color: color-mix(in srgb, var(--color-surface) 95%, transparent);
+}
+
+.hover\:bg-slate-800:hover,
+.hover\:bg-black:hover {
+  background-color: var(--color-brand-hover);
+}
+
+.text-\[\#8B5E3C\] {
+  color: var(--color-accent);
+}
+
+.bg-\[\#8B5E3C\] {
+  background-color: var(--color-accent);
+}
+
+.hover\:bg-\[\#734A2D\]:hover {
+  background-color: var(--color-brand-hover);
+}
+
+/* Shared fallback for legacy pages while component-level dark utilities are
+   progressively refined. This keeps every route readable in both themes. */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  border-color: #493f36;
+  background-color: #211c18;
+  color: #f5f1ea;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #bfb4a8;
+}
+
+html.dark .bg-white {
+  background-color: var(--color-surface);
+}
+
+html.dark .dark\:bg-white {
+  background-color: var(--color-accent);
+}
+
+html.dark .dark\:bg-slate-900\/95 {
+  background-color: color-mix(in srgb, var(--color-surface) 95%, transparent);
+}
+
+html.dark .dark\:text-slate-900 {
+  color: #151210;
+}
+
+html.dark .dark\:hover\:bg-slate-200:hover {
+  background-color: #bd996b;
+}
+
+html.dark .bg-gray-200,
+html.dark .bg-slate-50,
+html.dark .bg-slate-100 {
+  background-color: #2b241f;
+}
+
+html.dark .text-gray-900,
+html.dark .text-slate-900 {
+  color: var(--color-ink);
+}
+
+html.dark .text-gray-500,
+html.dark .text-slate-500,
+html.dark .text-slate-600,
+html.dark .text-slate-700 {
+  color: var(--color-muted);
+}
+
+html.dark .border,
+html.dark .border-slate-200 {
+  border-color: var(--color-border);
 }

@@ -4,245 +4,365 @@ import {
 
 import {
   Link,
-  useNavigate
+  NavLink
 } from "react-router-dom";
+import {
+  Heart,
+  ShoppingBag
+} from "lucide-react";
 
 import AuthContext
   from "../context/AuthContext";
 
+import LanguageContext
+  from "../context/LanguageContext";
+
+import PreferenceControls
+  from "../components/PreferenceControls";
+import WishlistContext
+  from "../context/WishlistContext";
 import CartContext
   from "../context/CartContext";
 
 function Header() {
-
   const {
     user,
     logout
-  } = useContext(
-    AuthContext
-  );
-const {
-  cartItems
-} = useContext(
-  CartContext
-);
+  } = useContext(AuthContext);
 
-  const navigate =
-    useNavigate();
-const cartCount =
-  cartItems.reduce(
-    (sum, item) =>
-      sum + item.quantity,
+  const {
+    t
+  } = useContext(
+    LanguageContext
+  );
+
+  const {
+    wishlistCount
+  } = useContext(WishlistContext);
+  const visibleWishlistCount =
+    user ? wishlistCount : 0;
+
+  const {
+    cartItems
+  } = useContext(CartContext);
+
+  const cartCount = cartItems.reduce(
+    (total, item) =>
+      total + Number(item.quantity || 1),
     0
   );
-  const handleLogout = () => {
 
-    logout();
-
-    navigate("/");
-  };
+  const navClass = ({
+    isActive
+  }) =>
+    [
+      "i18n-nav-item text-sm font-medium transition",
+      isActive
+        ? "text-slate-950 dark:text-white"
+        : "text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white"
+    ].join(" ");
 
   return (
-
     <header
-  className="
-    bg-white/90
-    backdrop-blur-md
-    border-b
-    sticky
-    top-0
-    z-50
-  "
->
-
+      className="
+        sticky
+        top-0
+        z-40
+        border-b
+        border-slate-200
+        bg-white/95
+        backdrop-blur
+        transition-colors
+        dark:border-slate-800
+        dark:bg-slate-900/95
+      "
+    >
       <div
         className="
-          max-w-7xl
           mx-auto
-          px-6
-          h-16
           flex
+          max-w-7xl
           items-center
           justify-between
+          gap-6
+          px-6
+          py-4
         "
       >
-
-        {/* Logo */}
-
         <Link
-  to="/"
-  className="
-    flex
-    items-center
-    gap-3
-  "
->
-  <img
-    src="/logo.png"
-    alt="Woodora"
-    className="w-12 h-12"
-  />
+          to="/"
+          className="
+            flex
+            shrink-0
+            items-center
+            gap-3
+            text-2xl
+            font-bold
+            text-slate-950
+            dark:text-white
+          "
+        >
+          <img
+            src="/logo.png"
+            alt=""
+            aria-hidden="true"
+            width="40"
+            height="40"
+            decoding="async"
+            className="
+              h-10
+              w-10
+              shrink-0
+              object-contain
+            "
+          />
 
-  <span
-    className="
-      text-3xl
-      font-bold
-      italic
-      text-[#8B5E3C]
-    "
-  >
-    Woodora
-  </span>
-</Link>
-
-        {/* Navigation */}
+          <span>Woodora</span>
+        </Link>
 
         <nav
           className="
-    flex
-    items-center
-    gap-8
-    font-medium
-  "
+            hidden
+            items-center
+            gap-6
+            md:flex
+          "
         >
+          <NavLink
+            to="/"
+            className={navClass}
+          >
+            {t("common.home")}
+          </NavLink>
 
-          <Link to="/">
-            Home
-          </Link>
-
-          <Link to="/products">
-  Products
-</Link>
+          <NavLink
+            to="/products"
+            className={navClass}
+          >
+            {t(
+              "common.products"
+            )}
+          </NavLink>
 
           {user && (
-            <>
-              <Link to="/cart">
-  Cart ({cartCount})
-</Link>
-
-              <Link to="/profile">
-                Profile
-              </Link>
-              <Link
-                to="/my-orders"
-              >
-                My Orders
-              </Link>
-            </>
+            <NavLink
+              to="/my-orders"
+              className={
+                navClass
+              }
+            >
+              {t(
+                "common.orders"
+              )}
+            </NavLink>
           )}
-
         </nav>
-
-        {/* Right Side */}
 
         <div
           className="
             flex
             items-center
-            gap-4
+            gap-3
           "
         >
-
-          {!user ? (
+          {user && (
             <>
-              <Link
-                to="/login"
-                className="
-                  px-4
-                  py-2
-                  border
-                  rounded
-                "
-              >
-                Login
-              </Link>
+          <Link
+            to="/wishlist"
+            aria-label={`${t("common.wishlist")} (${visibleWishlistCount})`}
+            className="
+              relative
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              text-slate-600
+              hover:bg-stone-100
+              hover:text-[#A98252]
+              dark:text-stone-300
+              dark:hover:bg-stone-800
+            "
+          >
+            <Heart
+              size={20}
+              fill={visibleWishlistCount > 0 ? "currentColor" : "none"}
+            />
 
-              <Link
-                to="/register"
-                className="
-                  px-4
-                  py-2
-                  bg-black
-                  text-white
-                  rounded
-                "
-              >
-                Register
-              </Link>
-            </>
-          ) : (
-            <>
+            {visibleWishlistCount > 0 && (
               <span
                 className="
-                  text-sm
-                  font-medium
+                  absolute
+                  -right-1
+                  -top-1
+                  flex
+                  h-5
+                  min-w-5
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-[#A98252]
+                  px-1
+                  text-[10px]
+                  font-bold
+                  text-white
                 "
               >
-                Hello, {user.fullname}
+                {visibleWishlistCount > 99 ? "99+" : visibleWishlistCount}
               </span>
+            )}
+          </Link>
 
-              {user.role ===
-  "admin" && (
+          <Link
+            to="/cart"
+            aria-label={`${t("common.cart")} (${cartCount})`}
+            className="
+              relative
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-lg
+              text-slate-600
+              transition
+              hover:bg-stone-100
+              hover:text-[#A98252]
+              dark:text-stone-300
+              dark:hover:bg-stone-800
+            "
+          >
+            <ShoppingBag size={20} />
 
-  <div
-    className="
-      flex
-      gap-2
-    "
-  >
-
-    <Link
-      to="/admin"
-      className="
-        px-4
-        py-2
-        bg-blue-600
-        text-white
-        rounded
-      "
-    >
-      Dashboard
-    </Link>
-
-    <Link
-      to="/admin/orders"
-      className="
-        px-4
-        py-2
-        bg-green-600
-        text-white
-        rounded
-      "
-    >
-      Orders
-    </Link>
-
-  </div>
-
-)}
-
-              <button
-                onClick={
-                  handleLogout
-                }
+            {cartCount > 0 && (
+              <span
                 className="
-                  px-4
-                  py-2
-                  border
-                  rounded
+                  absolute
+                  -right-1
+                  -top-1
+                  flex
+                  h-5
+                  min-w-5
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-[#A98252]
+                  px-1
+                  text-[10px]
+                  font-bold
+                  text-white
                 "
               >
-                Logout
-              </button>
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
             </>
           )}
 
+          {user ? (
+            <>
+              <Link
+                to="/profile"
+                className="
+                  hidden
+                  i18n-action
+                  rounded-lg
+                  px-3
+                  py-2
+                  text-sm
+                  font-medium
+                  text-slate-600
+                  transition
+                  hover:bg-slate-100
+                  dark:text-slate-300
+                  dark:hover:bg-slate-800
+                  sm:block
+                "
+              >
+                {t(
+                  "common.profile"
+                )}
+              </Link>
+
+              {user.role ===
+                "admin" && (
+                <Link
+                  to="/admin"
+                  className="
+                    rounded-lg
+                    i18n-action
+                    bg-slate-900
+                    px-4
+                    py-2
+                    text-sm
+                    font-semibold
+                    text-white
+                    transition
+                    hover:bg-slate-800
+                    dark:bg-white
+                    dark:text-slate-900
+                  "
+                >
+                  Admin
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={logout}
+                className="
+                  rounded-lg
+                  i18n-action
+                  px-3
+                  py-2
+                  text-sm
+                  font-medium
+                  text-red-600
+                  transition
+                  hover:bg-red-50
+                  dark:text-red-400
+                  dark:hover:bg-red-950/40
+                "
+              >
+                {t(
+                  "common.logout"
+                )}
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="
+                rounded-lg
+                i18n-action
+                bg-slate-900
+                px-4
+                py-2
+                text-sm
+                font-semibold
+                text-white
+                transition
+                hover:bg-slate-800
+                dark:bg-white
+                dark:text-slate-900
+              "
+            >
+              {t(
+                "common.login"
+              )}
+            </Link>
+              )}
+
+          <PreferenceControls
+            compact
+          />
         </div>
-
       </div>
-
     </header>
-
   );
 }
 

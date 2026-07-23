@@ -13,8 +13,11 @@ import AuthContext
 import {
   login
 } from "../api/authApi";
+import LanguageContext from "../context/LanguageContext";
+import MainLayout from "../layouts/MainLayout";
 
 function Login() {
+  const { t } = useContext(LanguageContext);
 
   const navigate =
     useNavigate();
@@ -56,7 +59,7 @@ function Login() {
       } catch (error) {
 
         alert(
-          "Login failed"
+          t("user.loginFailed")
         );
 
       }
@@ -64,10 +67,10 @@ function Login() {
 
   return (
 
-    <div className="max-w-md mx-auto mt-20">
+    <MainLayout><div className="max-w-md mx-auto w-full py-20 px-6">
 
       <h1 className="text-3xl font-bold mb-6">
-        Login
+        {t("common.login")}
       </h1>
 
       <form
@@ -79,7 +82,7 @@ function Login() {
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t("common.email")}
           value={email}
           onChange={(e) =>
             setEmail(
@@ -91,7 +94,7 @@ function Login() {
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t("common.password")}
           value={password}
           onChange={(e) =>
             setPassword(
@@ -110,12 +113,12 @@ function Login() {
             py-3
           "
         >
-          Login
+          {t("common.login")}
         </button>
 
       </form>
 
-    </div>
+    </div></MainLayout>
 
   );
 }

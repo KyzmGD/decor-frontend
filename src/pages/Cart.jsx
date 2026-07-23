@@ -11,8 +11,10 @@ import {
 
 import MainLayout
   from "../layouts/MainLayout";
+import LanguageContext from "../context/LanguageContext";
 
 function Cart() {
+  const { t } = useContext(LanguageContext);
 
   const {
     cartItems,
@@ -49,13 +51,13 @@ function Cart() {
           mb-6
         "
       >
-        Shopping Cart
+        {t("user.shoppingCart")}
       </h1>
 
       {cartItems.length === 0 ? (
 
         <p>
-          Your cart is empty
+          {t("user.emptyCart")}
         </p>
 
       ) : (
@@ -139,7 +141,7 @@ function Cart() {
                       rounded
                     "
                   >
-                    Remove
+                    {t("common.remove")}
                   </button>
 
                 </div>
@@ -163,7 +165,7 @@ function Cart() {
       mb-4
     "
   >
-    Total: $
+    {t("common.total")}: $
     {total.toFixed(2)}
   </h2>
 
@@ -178,7 +180,7 @@ function Cart() {
       inline-block
     "
   >
-    Checkout
+    {t("user.checkout")}
   </Link>
 
 </div>

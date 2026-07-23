@@ -4,7 +4,10 @@ import {
   useContext
 } from "react";
 
-import { useParams }
+import {
+  useNavigate,
+  useParams
+}
   from "react-router-dom";
 
 import MainLayout
@@ -16,14 +19,28 @@ import {
 
 import CartContext
   from "../context/CartContext";
+import LanguageContext from "../context/LanguageContext";
+import WishlistContext from "../context/WishlistContext";
+import AuthContext from "../context/AuthContext";
+import { Heart } from "lucide-react";
+
+import toast
+  from "react-hot-toast";
 
 function ProductDetail() {
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const { t } = useContext(LanguageContext);
 
   const { id } =
     useParams();
 console.log(useContext(CartContext));
   const { addToCart } =
     useContext(CartContext);
+  const {
+    isInWishlist,
+    toggleWishlist
+  } = useContext(WishlistContext);
 
   const [product, setProduct] =
     useState(null);
@@ -42,7 +59,7 @@ console.log(useContext(CartContext));
     };
 
   if (!product) {
-    return <p>Loading...</p>;
+    return <p className="p-10">{t("common.loading")}</p>;
   }
 
   return (
@@ -78,26 +95,77 @@ console.log(useContext(CartContext));
           {product.description}
         </p>
 
-        <button
-          onClick={() =>{
-            console.log("clicked");
-            addToCart(product)
-          }
-          }
-          className="
-  mt-8
-  bg-[#8B5E3C]
-  hover:bg-[#734A2D]
-  text-white
-  px-8
-  py-4
-  rounded-xl
-  font-semibold
-  transition
-"
-        >
-          Add To Cart
-        </button>
+        {user && (
+          <div className="mt-8 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              addToCart(product);
+              toast.success(t("user.addedToCart"));
+            }}
+            className="
+              rounded-xl
+              bg-slate-900
+              px-8
+              py-4
+              font-semibold
+              text-white
+              hover:bg-slate-800
+            "
+          >
+            {t("user.addToCart")}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!user) {
+                toast.error(t("user.loginToWishlist"));
+                navigate("/login");
+                return;
+              }
+
+              const added = toggleWishlist(product);
+              toast.success(
+                t(
+                  added
+                    ? "user.addedToWishlist"
+                    : "user.removedFromWishlist"
+                )
+              );
+            }}
+            aria-pressed={
+              Boolean(user) &&
+              isInWishlist(product.id)
+            }
+            className={`
+              flex
+              items-center
+              gap-2
+              rounded-xl
+              border
+              px-6
+              py-4
+              font-semibold
+              ${
+                user && isInWishlist(product.id)
+                  ? "border-[#A98252] bg-[#A98252] text-white"
+                  : "border-stone-300 hover:border-[#A98252] hover:text-[#A98252] dark:border-stone-600"
+              }
+            `}
+          >
+            <Heart
+              size={19}
+              fill={
+                user && isInWishlist(product.id)
+                  ? "currentColor"
+                  : "none"
+              }
+            />
+            {t("common.wishlist")}
+          </button>
+          </div>
+        )}
 
       </div>
     </MainLayout>

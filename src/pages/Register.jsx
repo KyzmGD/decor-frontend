@@ -1,4 +1,5 @@
 import {
+  useContext,
   useState
 } from "react";
 
@@ -9,8 +10,11 @@ import {
 import {
   register
 } from "../api/authApi";
+import LanguageContext from "../context/LanguageContext";
+import MainLayout from "../layouts/MainLayout";
 
 function Register() {
+  const { t } = useContext(LanguageContext);
 
   const navigate =
     useNavigate();
@@ -39,10 +43,10 @@ function Register() {
 
   return (
 
-    <div className="max-w-md mx-auto mt-20">
+    <MainLayout><div className="max-w-md mx-auto w-full py-20 px-6">
 
       <h1 className="text-3xl font-bold mb-6">
-        Register
+        {t("common.register")}
       </h1>
 
       <form
@@ -53,7 +57,7 @@ function Register() {
       >
 
         <input
-          placeholder="Full Name"
+          placeholder={t("common.fullName")}
           className="w-full border p-3"
           onChange={(e) =>
             setFormData({
@@ -65,7 +69,7 @@ function Register() {
         />
 
         <input
-          placeholder="Email"
+          placeholder={t("common.email")}
           className="w-full border p-3"
           onChange={(e) =>
             setFormData({
@@ -78,7 +82,7 @@ function Register() {
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t("common.password")}
           className="w-full border p-3"
           onChange={(e) =>
             setFormData({
@@ -97,12 +101,12 @@ function Register() {
             py-3
           "
         >
-          Register
+          {t("common.register")}
         </button>
 
       </form>
 
-    </div>
+    </div></MainLayout>
 
   );
 }

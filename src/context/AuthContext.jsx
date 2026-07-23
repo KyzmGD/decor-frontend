@@ -4,57 +4,46 @@ import {
   useEffect
 } from "react";
 
-const AuthContext =
-  createContext();
+const AuthContext = createContext();
 
 export default AuthContext;
 
-export function AuthProvider({
-  children
-}) {
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(undefined);
 
-  const [user, setUser] =
-  useState(undefined);
+  const [token, setToken] = useState(
+    localStorage.getItem("token")
+  );
 
-  const [token, setToken] =
-    useState(
-      localStorage.getItem(
-        "token"
-      )
-    );
-  const [loading, setLoading] =
-  useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const savedUser = localStorage.getItem("user");
 
-  const savedUser =
-    localStorage.getItem(
-      "user"
-    );
+    if (!savedUser) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
 
-  if (savedUser) {
+    try {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+    } catch (error) {
+      console.error("Invalid saved user data:", error);
 
-    setUser(
-      JSON.parse(savedUser)
-    );
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
 
-  } else {
+      setUser(null);
+      setToken(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    setUser(null);
-
-  }
-
-  setLoading(false);
-
-}, []);
-
-  const loginUser = (
-    userData,
-    jwtToken
-  ) => {
-
+  const loginUser = (userData, jwtToken) => {
     setUser(userData);
-
     setToken(jwtToken);
 
     localStorage.setItem(
@@ -69,29 +58,22 @@ export function AuthProvider({
   };
 
   const logout = () => {
-
     setUser(null);
-
     setToken(null);
 
-    localStorage.removeItem(
-      "user"
-    );
-
-    localStorage.removeItem(
-      "token"
-    );
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (
     <AuthContext.Provider
       value={{
-  user,
-  token,
-  loading,
-  loginUser,
-  logout
-}}
+        user,
+        token,
+        loading,
+        loginUser,
+        logout
+      }}
     >
       {children}
     </AuthContext.Provider>

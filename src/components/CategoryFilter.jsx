@@ -1,8 +1,12 @@
+import { useContext } from "react";
+import LanguageContext from "../context/LanguageContext";
+
 function CategoryFilter({
   categories,
   selectedCategory,
   onChange
 }) {
+  const { t } = useContext(LanguageContext);
   return (
     <select
       value={selectedCategory}
@@ -14,10 +18,11 @@ function CategoryFilter({
         px-4
         py-2
         rounded
+        min-w-52
       "
     >
       <option value="">
-        All Categories
+        {t("user.allCategories")}
       </option>
 
       {categories.map((category) => (

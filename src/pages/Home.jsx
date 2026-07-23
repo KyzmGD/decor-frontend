@@ -1,4 +1,5 @@
 import {
+  useContext,
   useEffect,
   useState
 } from "react";
@@ -22,8 +23,10 @@ import {
 import {
   getCategories
 } from "../api/categoryApi";
+import LanguageContext from "../context/LanguageContext";
 
 function Home() {
+  const { t } = useContext(LanguageContext);
 
   const [
     products,
@@ -123,6 +126,7 @@ function Home() {
       h-full
       object-cover
     "
+    alt=""
   />
 
   <div
@@ -152,7 +156,7 @@ function Home() {
         font-bold
       "
     >
-      Timeless Furniture
+      {t("user.heroTitle")}
     </h1>
 
     <p
@@ -162,8 +166,7 @@ function Home() {
         max-w-xl
       "
     >
-      Premium furniture crafted
-      for modern living spaces.
+      {t("user.heroDescription")}
     </p>
 
     <button
@@ -176,7 +179,7 @@ function Home() {
         text-lg
       "
     >
-      Shop Collection
+      {t("user.shopCollection")}
     </button>
 
   </div>
@@ -200,7 +203,7 @@ function Home() {
     mb-12
   "
 >
-  Featured Products
+  {t("user.featuredProducts")}
 </h2>
 
         <div className="mb-6">
@@ -226,7 +229,7 @@ function Home() {
               text-gray-500
             "
           >
-            No products found
+            {t("user.noProducts")}
           </div>
 
         ) : (

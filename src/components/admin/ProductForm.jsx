@@ -1,13 +1,16 @@
 import {
+  useContext,
   useState,
   useEffect
 } from "react";
+import LanguageContext from "../../context/LanguageContext";
 
 function ProductForm({
   selectedProduct,
   categories,
   onSubmit
 }) {
+  const { t } = useContext(LanguageContext);
 
   const [name, setName] =
     useState("");
@@ -102,7 +105,7 @@ function ProductForm({
 
       <input
         type="text"
-        placeholder="Name"
+        placeholder={t("common.name")}
         value={name}
         onChange={(e) =>
           setName(
@@ -118,7 +121,7 @@ function ProductForm({
       />
 
       <textarea
-        placeholder="Description"
+        placeholder={t("common.description")}
         value={description}
         onChange={(e) =>
           setDescription(
@@ -135,7 +138,7 @@ function ProductForm({
 
       <input
         type="number"
-        placeholder="Price"
+        placeholder={t("common.price")}
         value={price}
         onChange={(e) =>
           setPrice(
@@ -152,7 +155,7 @@ function ProductForm({
 
       <input
         type="number"
-        placeholder="Stock"
+        placeholder={t("common.stock")}
         value={stock}
         onChange={(e) =>
           setStock(
@@ -169,7 +172,7 @@ function ProductForm({
 
       <input
         type="text"
-        placeholder="Image URL"
+        placeholder={t("common.imageUrl")}
         value={image}
         onChange={(e) =>
           setImage(
@@ -199,7 +202,7 @@ function ProductForm({
         "
       >
         <option value="">
-          Select Category
+          {t("common.selectCategory")}
         </option>
 
         {categories.map(
@@ -224,8 +227,8 @@ function ProductForm({
         "
       >
         {selectedProduct
-          ? "Update Product"
-          : "Create Product"}
+          ? `${t("common.update")} ${t("common.product")}`
+          : `${t("common.create")} ${t("common.product")}`}
       </button>
 
     </form>

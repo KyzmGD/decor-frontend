@@ -1,15 +1,4 @@
-import {
-  useContext
-} from "react";
-
-import ProductCreate
-  from "./pages/admin/ProductCreate";
-
-import ProductEdit
-  from "./pages/admin/ProductEdit";
-  
-import ProductList
-  from "./components/admin/ProductList";
+import { useContext } from "react";
 import {
   Routes,
   Route
@@ -18,29 +7,25 @@ import {
 import AuthContext
   from "./context/AuthContext";
 
-import Home
-  from "./pages/Home";
-
-import ProductDetail
-  from "./pages/ProductDetail";
-
-import Login
-  from "./pages/Login";
-
-import Register
-  from "./pages/Register";
-
-import Cart
-  from "./pages/Cart";
-
-import MyOrders
-  from "./pages/MyOrders";
-
-import Profile
-  from "./pages/Profile";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import MyOrders from "./pages/MyOrders";
+import Profile from "./pages/Profile";
+import Wishlist from "./pages/Wishlist";
 
 import AdminDashboard
   from "./pages/admin/AdminDashboard";
+
+import AdminProducts
+  from "./pages/admin/AdminProducts";
+
+import AdminCategories
+  from "./pages/admin/AdminCategories";
 
 import OrderManagement
   from "./pages/admin/OrderManagement";
@@ -51,25 +36,22 @@ import PrivateRoute
 import AdminRoute
   from "./components/AdminRoute";
 
-import Checkout
-  from "./pages/Checkout";
-
 function App() {
-
   const {
-  user,
-  loading
-} = useContext(
-  AuthContext
-);
+    user,
+    loading
+  } = useContext(AuthContext);
 
   return (
-
     <Routes>
-
       <Route
         path="/"
         element={<Home />}
+      />
+
+      <Route
+        path="/products"
+        element={<Products />}
       />
 
       <Route
@@ -85,6 +67,18 @@ function App() {
       <Route
         path="/register"
         element={<Register />}
+      />
+
+      <Route
+        path="/wishlist"
+        element={
+          <PrivateRoute
+            user={user}
+            loading={loading}
+          >
+            <Wishlist />
+          </PrivateRoute>
+        }
       />
 
       <Route
@@ -110,77 +104,79 @@ function App() {
           </PrivateRoute>
         }
       />
+
       <Route
-  path="/my-orders"
-  element={
-    <PrivateRoute
-      user={user}
-      loading={loading}
-    >
-      <MyOrders />
-    </PrivateRoute>
-  }
-/>
+        path="/checkout"
+        element={
+          <PrivateRoute
+            user={user}
+            loading={loading}
+          >
+            <Checkout />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/my-orders"
+        element={
+          <PrivateRoute
+            user={user}
+            loading={loading}
+          >
+            <MyOrders />
+          </PrivateRoute>
+        }
+      />
 
       <Route
         path="/admin"
         element={
           <AdminRoute
             user={user}
+            loading={loading}
           >
             <AdminDashboard />
           </AdminRoute>
         }
       />
+
       <Route
-  path="/admin/orders"
-  element={
-    <AdminRoute
-      user={user}
-    >
-      <OrderManagement />
-    </AdminRoute>
-  }
-/>
-<Route
-  path="/admin/products"
-  element={
-    <AdminRoute
-      user={user}
-    >
-      <ProductList />
-    </AdminRoute>
-  }
-/>
-<Route
-  path="/admin/products/create"
-  element={
-    <AdminRoute user={user}>
-      <ProductCreate />
-    </AdminRoute>
-  }
-/>
+        path="/admin/products"
+        element={
+          <AdminRoute
+            user={user}
+            loading={loading}
+          >
+            <AdminProducts />
+          </AdminRoute>
+        }
+      />
 
-<Route
-  path="/admin/products/edit/:id"
-  element={
-    <AdminRoute user={user}>
-      <ProductEdit />
-    </AdminRoute>
-  }
-/>
-<Route
-  path="/checkout"
-  element={
-    <PrivateRoute
-    user={user}>
-    loading={loading}
-      <Checkout />
-    </PrivateRoute>
-  }
-/>
+      <Route
+        path="/admin/categories"
+        element={
+          <AdminRoute
+            user={user}
+            loading={loading}
+          >
+            <AdminCategories />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/orders"
+        element={
+          <AdminRoute
+            user={user}
+            loading={loading}
+          >
+            <OrderManagement />
+          </AdminRoute>
+        }
+      />
     </Routes>
-
   );
 }
 

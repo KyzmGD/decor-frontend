@@ -1,109 +1,74 @@
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+
+import LanguageContext from "../context/LanguageContext";
+
 function Footer() {
+  const { t } = useContext(LanguageContext);
 
   return (
-
     <footer
       className="
-        bg-[#1F1F1F]
-        text-white
-        mt-20
+        mt-auto
+        border-t
+        border-slate-200
+        bg-white
+        transition-colors
+        duration-200
+        dark:border-slate-800
+        dark:bg-slate-900
       "
     >
-
       <div
         className="
-          max-w-7xl
           mx-auto
+          flex
+          max-w-7xl
+          flex-col
+          gap-4
           px-6
-          py-16
-          grid
-          md:grid-cols-4
-          gap-8
+          py-8
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
         "
       >
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          © 2026 Woodora
+        </p>
 
-        <div>
-
-          <h2
-            className="
-              text-2xl
-              font-bold
+        <nav
+          aria-label={t("common.footerNavigation", "Footer navigation")}
+          className="flex gap-5 text-sm"
+        >
+          <Link
+            to="/"
+            className="i18n-nav-item
+              text-slate-500
+              transition-colors
+              hover:text-slate-950
+              dark:text-slate-400
+              dark:hover:text-white
             "
           >
-            Woodora
-          </h2>
+            {t("common.home")}
+          </Link>
 
-          <p className="mt-4">
-            Premium furniture
-            for modern homes.
-          </p>
-
-        </div>
-
-        <div>
-
-          <h3
-            className="
-              font-semibold
-              mb-4
+          <Link
+            to="/products"
+            className="i18n-nav-item
+              text-slate-500
+              transition-colors
+              hover:text-slate-950
+              dark:text-slate-400
+              dark:hover:text-white
             "
           >
-            Shop
-          </h3>
-
-          <p>Sofas</p>
-          <p>Tables</p>
-          <p>Chairs</p>
-
-        </div>
-
-        <div>
-
-          <h3
-            className="
-              font-semibold
-              mb-4
-            "
-          >
-            Company
-          </h3>
-
-          <p>About Us</p>
-          <p>Contact</p>
-
-        </div>
-
-        <div>
-
-          <h3
-            className="
-              font-semibold
-              mb-4
-            "
-          >
-            Follow
-          </h3>
-
-          <p>Facebook</p>
-          <p>Instagram</p>
-
-        </div>
-
+            {t("common.products")}
+          </Link>
+        </nav>
       </div>
-
-      <div
-        className="
-          text-center
-          py-4
-          border-t
-          border-white/10
-        "
-      >
-        © 2026 Woodora
-      </div>
-
     </footer>
-
   );
 }
 

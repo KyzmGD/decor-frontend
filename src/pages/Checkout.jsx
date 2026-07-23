@@ -19,8 +19,10 @@ import {
 
 import MainLayout
   from "../layouts/MainLayout";
+import LanguageContext from "../context/LanguageContext";
 
 function Checkout() {
+  const { t } = useContext(LanguageContext);
 
   const navigate =
     useNavigate();
@@ -65,7 +67,7 @@ function Checkout() {
         cartItems.length === 0
       ) {
         alert(
-          "Cart is empty"
+          t("user.cartEmptyError")
         );
         return;
       }
@@ -87,7 +89,7 @@ function Checkout() {
 clearCart();
 
 alert(
-  "Order placed successfully"
+  t("user.orderSuccess")
 );
 
 navigate("/");
@@ -132,7 +134,7 @@ navigate("/");
             mb-6
           "
         >
-          Checkout
+          {t("user.checkout")}
         </h1>
 
         <form
@@ -144,7 +146,7 @@ navigate("/");
           <div className="mb-4">
 
             <label>
-              Phone
+              {t("common.phone")}
             </label>
 
             <input
@@ -169,7 +171,7 @@ navigate("/");
           <div className="mb-4">
 
             <label>
-              Address
+              {t("common.address")}
             </label>
 
             <textarea
@@ -207,7 +209,7 @@ navigate("/");
                 mb-3
               "
             >
-              Order Summary
+              {t("user.orderSummary")}
             </h2>
 
             {cartItems.map(
@@ -256,7 +258,7 @@ navigate("/");
             >
 
               <span>
-                Total
+                {t("common.total")}
               </span>
 
               <span>
@@ -284,8 +286,8 @@ navigate("/");
           >
 
             {loading
-              ? "Placing Order..."
-              : "Place Order"}
+              ? t("user.placingOrder")
+              : t("user.placeOrder")}
 
           </button>
 
