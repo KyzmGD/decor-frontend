@@ -23,7 +23,7 @@ export function CartProvider({ children }) {
     );
   }, [cartItems]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
     const existing =
       cartItems.find(
         item => item.id === product.id
@@ -36,7 +36,7 @@ export function CartProvider({ children }) {
             ? {
                 ...item,
                 quantity:
-                  item.quantity + 1
+                  item.quantity + quantity
               }
             : item
         )
@@ -46,7 +46,7 @@ export function CartProvider({ children }) {
         ...cartItems,
         {
           ...product,
-          quantity: 1
+          quantity
         }
       ]);
     }

@@ -9,7 +9,9 @@ import {
   Search,
   ShoppingCart,
   RefreshCcw,
-  Eye
+  Eye,
+  AlertTriangle,
+  ShieldCheck
 } from "lucide-react";
 
 import AuthContext from "../../context/AuthContext";
@@ -18,7 +20,8 @@ import AdminLayout from "../../layouts/AdminLayout";
 
 import {
   getAllOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  confirmLowStockOrder
 } from "../../api/orderApi";
 
 function OrderManagement() {
@@ -31,6 +34,7 @@ function OrderManagement() {
 
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [confirmingId, setConfirmingId] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -127,12 +131,47 @@ function OrderManagement() {
     }
   };
 
+  const handleLowStockConfirmation = async (orderId) => {
+    if (!window.confirm(t("admin.confirmLowStockPrompt"))) {
+      return;
+    }
+
+    try {
+      setConfirmingId(orderId);
+      setError("");
+
+      const response = await confirmLowStockOrder(
+        orderId,
+        token
+      );
+
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                ...response.data
+              }
+            : order
+        )
+      );
+    } catch (error) {
+      console.error("Confirm low stock order failed:", error);
+      setError(
+        error.response?.data?.message ||
+        t("admin.confirmLowStockError")
+      );
+    } finally {
+      setConfirmingId(null);
+    }
+  };
+
   const getStatusClasses = (status) => {
-    switch (status) {
+    switch (String(status).toLowerCase()) {
       case "pending":
         return "bg-amber-50 text-amber-700";
 
-      case "confirmed":
+      case "processing":
         return "bg-amber-50 text-amber-800";
 
       case "shipping":
@@ -150,11 +189,11 @@ function OrderManagement() {
   };
 
   const getStatusLabel = (status) => {
-    switch (status) {
+    switch (String(status).toLowerCase()) {
       case "pending":
         return t("admin.pending");
 
-      case "confirmed":
+      case "processing":
         return t("admin.confirmed");
 
       case "shipping":
@@ -206,23 +245,23 @@ function OrderManagement() {
               {t("admin.allStatuses")}
             </option>
 
-            <option value="pending">
+            <option value="Pending">
               {t("admin.pending")}
             </option>
 
-            <option value="confirmed">
+            <option value="Processing">
               {t("admin.confirmed")}
             </option>
 
-            <option value="shipping">
+            <option value="Shipping">
               {t("admin.shipping")}
             </option>
 
-            <option value="completed">
+            <option value="Completed">
               {t("admin.completed")}
             </option>
 
-            <option value="cancelled">
+            <option value="Cancelled">
               {t("admin.cancelled")}
             </option>
           </select>
@@ -321,6 +360,16 @@ function OrderManagement() {
                     order.total ||
                     0;
 
+                  const needsConfirmation =
+                    order.requiresStockConfirmation &&
+                    !order.stockConfirmed;
+
+                  const lowStockItems =
+                    order.OrderItems?.filter(
+                      (item) =>
+                        Number(item.Product?.stock) < 4
+                    ) || [];
+
                   return (
                     <tr
                       key={order.id}
@@ -341,6 +390,25 @@ function OrderManagement() {
                           <p className="mt-1 text-sm text-slate-500">
                             {customerEmail}
                           </p>
+
+                          {needsConfirmation && (
+                            <div className="mt-2 flex items-start gap-1.5 text-xs font-semibold text-amber-700">
+                              <AlertTriangle
+                                size={14}
+                                className="mt-0.5 shrink-0"
+                              />
+                              <span>
+                                {t("admin.lowStockWarning")}
+                                {lowStockItems.length > 0 &&
+                                  `: ${lowStockItems
+                                    .map(
+                                      (item) =>
+                                        `${item.Product?.name} (${item.Product?.stock})`
+                                    )
+                                    .join(", ")}`}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </td>
 
@@ -374,10 +442,27 @@ function OrderManagement() {
 
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">
+                          {needsConfirmation && (
+                            <button
+                              type="button"
+                              disabled={confirmingId === order.id}
+                              onClick={() =>
+                                handleLowStockConfirmation(order.id)
+                              }
+                              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-700 disabled:opacity-50"
+                            >
+                              <ShieldCheck size={17} />
+                              {confirmingId === order.id
+                                ? t("common.loading")
+                                : t("admin.confirmOrder")}
+                            </button>
+                          )}
+
                           <select
-                            value={order.status || "pending"}
+                            value={order.status || "Pending"}
                             disabled={
-                              updatingId === order.id
+                              updatingId === order.id ||
+                              confirmingId === order.id
                             }
                             onChange={(event) =>
                               handleStatusChange(
@@ -387,23 +472,32 @@ function OrderManagement() {
                             }
                             className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-900"
                           >
-                            <option value="pending">
+                            <option value="Pending">
                               {t("admin.pending")}
                             </option>
 
-                            <option value="confirmed">
+                            <option
+                              value="Processing"
+                              disabled={needsConfirmation}
+                            >
                               {t("admin.confirmed")}
                             </option>
 
-                            <option value="shipping">
+                            <option
+                              value="Shipping"
+                              disabled={needsConfirmation}
+                            >
                               {t("admin.shipping")}
                             </option>
 
-                            <option value="completed">
+                            <option
+                              value="Completed"
+                              disabled={needsConfirmation}
+                            >
                               {t("admin.completed")}
                             </option>
 
-                            <option value="cancelled">
+                            <option value="Cancelled">
                               {t("admin.cancelled")}
                             </option>
                           </select>

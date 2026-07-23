@@ -44,3 +44,11 @@ export const updateOrderStatus =
       { status },
       getConfig(token)
     );
+
+export const confirmLowStockOrder =
+  (id, token) =>
+    axios.patch(
+      `${API_URL}/${id}/confirm-stock`,
+      {},
+      getConfig(token)
+    );
