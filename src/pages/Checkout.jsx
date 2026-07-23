@@ -27,11 +27,11 @@ function Checkout() {
 
   const [form, setForm] = useState({
     recipientName: user?.fullname || user?.name || "",
-    phone: "",
+    phone: user?.phone || "",
     email: user?.email || "",
-    city: "",
-    district: "",
-    address: "",
+    city: user?.city || "",
+    district: user?.district || "",
+    address: user?.address || "",
     note: ""
   });
   const [shippingMethod, setShippingMethod] =

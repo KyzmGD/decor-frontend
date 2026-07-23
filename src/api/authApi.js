@@ -38,3 +38,19 @@ export const getProfile = (
     }
   );
 };
+
+export const updateProfile = (
+  data,
+  token
+) => {
+  return axios.put(
+    `${API_URL}/profile`,
+    data,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`
+      }
+    }
+  );
+};
