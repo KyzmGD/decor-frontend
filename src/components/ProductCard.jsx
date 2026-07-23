@@ -49,6 +49,7 @@ function ProductCard({ product }) {
   return (
     <article
       className="
+        product-card
         group
         relative
         overflow-hidden
@@ -58,9 +59,8 @@ function ProductCard({ product }) {
         bg-white
         shadow-sm
         transition-all
-        duration-300
-        hover:-translate-y-2
-        hover:shadow-xl
+        duration-500
+        hover:shadow-lg
         dark:border-stone-700
         dark:bg-stone-900
       "
@@ -112,9 +112,10 @@ function ProductCard({ product }) {
               h-56
               w-full
               object-cover
-              transition
-              duration-500
-              group-hover:scale-105
+              transition-transform
+              duration-1000
+              ease-out
+              group-hover:scale-110
             "
           />
         </div>

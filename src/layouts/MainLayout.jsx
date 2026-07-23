@@ -1,3 +1,5 @@
+import { useLocation } from "react-router-dom";
+
 import Header
   from "../components/Header";
 
@@ -7,6 +9,8 @@ import Footer
 function MainLayout({
   children
 }) {
+  const location = useLocation();
+
   return (
     <div
       className="
@@ -22,7 +26,10 @@ function MainLayout({
     >
       <Header />
 
-      <main className="flex-1">
+      <main
+        key={location.pathname}
+        className="page-enter flex-1"
+      >
         {children}
       </main>
 

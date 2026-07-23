@@ -65,6 +65,7 @@ function Header() {
   return (
     <header
       className="
+        site-header
         sticky
         top-0
         z-40
@@ -92,6 +93,7 @@ function Header() {
         <Link
           to="/"
           className="
+            brand-link
             flex
             shrink-0
             items-center
@@ -110,6 +112,7 @@ function Header() {
             height="40"
             decoding="async"
             className="
+              brand-logo
               h-10
               w-10
               shrink-0
