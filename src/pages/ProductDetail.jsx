@@ -47,12 +47,23 @@ console.log(useContext(CartContext));
 
   return (
     <MainLayout>
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="
+    max-w-7xl
+    mx-auto
+    px-6
+    py-16
+    grid
+    md:grid-cols-2
+    gap-16
+  ">
 
         <img
           src={product.image}
           alt={product.name}
-          className="w-full max-w-md"
+          className="
+  rounded-2xl
+  shadow-lg
+"
         />
 
         <h1 className="text-4xl font-bold mt-6">
@@ -74,13 +85,16 @@ console.log(useContext(CartContext));
           }
           }
           className="
-            mt-6
-            bg-black
-            text-white
-            px-6
-            py-3
-            rounded
-          "
+  mt-8
+  bg-[#8B5E3C]
+  hover:bg-[#734A2D]
+  text-white
+  px-8
+  py-4
+  rounded-xl
+  font-semibold
+  transition
+"
         >
           Add To Cart
         </button>

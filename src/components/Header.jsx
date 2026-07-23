@@ -44,7 +44,16 @@ const cartCount =
 
   return (
 
-    <header className="bg-white shadow">
+    <header
+  className="
+    bg-white/90
+    backdrop-blur-md
+    border-b
+    sticky
+    top-0
+    z-50
+  "
+>
 
       <div
         className="
@@ -61,39 +70,40 @@ const cartCount =
         {/* Logo */}
 
         <Link
-          to="/"
-          className="
+  to="/"
+  className="
     flex
     items-center
     gap-3
   "
-        >
-          <img
-            src="/logo.png"
-            alt="Woodora"
-            className="w-20 h-20"
-          />
+>
+  <img
+    src="/logo.png"
+    alt="Woodora"
+    className="w-12 h-12"
+  />
 
-          <span
-            className="
-    text-3xl
-    font-bold
-    italic
-    tracking-wide
-  "
-          >
-            Woodora
-          </span>
-        </Link>
+  <span
+    className="
+      text-3xl
+      font-bold
+      italic
+      text-[#8B5E3C]
+    "
+  >
+    Woodora
+  </span>
+</Link>
 
         {/* Navigation */}
 
         <nav
           className="
-            flex
-            items-center
-            gap-6
-          "
+    flex
+    items-center
+    gap-8
+    font-medium
+  "
         >
 
           <Link to="/">

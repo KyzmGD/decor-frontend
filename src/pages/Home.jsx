@@ -107,7 +107,81 @@ function Home() {
   return (
     <MainLayout>
 
-      <HeroBanner />
+      <section
+  className="
+    relative
+    h-[700px]
+  "
+>
+
+  <img
+    src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
+    className="
+      absolute
+      inset-0
+      w-full
+      h-full
+      object-cover
+    "
+  />
+
+  <div
+    className="
+      absolute
+      inset-0
+      bg-black/40
+    "
+  />
+
+  <div
+    className="
+      relative
+      h-full
+      flex
+      flex-col
+      justify-center
+      items-center
+      text-white
+      text-center
+    "
+  >
+
+    <h1
+      className="
+        text-7xl
+        font-bold
+      "
+    >
+      Timeless Furniture
+    </h1>
+
+    <p
+      className="
+        mt-6
+        text-xl
+        max-w-xl
+      "
+    >
+      Premium furniture crafted
+      for modern living spaces.
+    </p>
+
+    <button
+      className="
+        mt-8
+        bg-[#8B5E3C]
+        px-8
+        py-4
+        rounded-xl
+        text-lg
+      "
+    >
+      Shop Collection
+    </button>
+
+  </div>
+
+</section>
 
       <section
         className="
@@ -119,14 +193,15 @@ function Home() {
       >
 
         <h2
-          className="
-            text-3xl
-            font-bold
-            mb-6
-          "
-        >
-          Featured Products
-        </h2>
+  className="
+    text-4xl
+    font-bold
+    text-center
+    mb-12
+  "
+>
+  Featured Products
+</h2>
 
         <div className="mb-6">
 
@@ -158,12 +233,12 @@ function Home() {
 
           <div
             className="
-              grid
-              grid-cols-1
-              md:grid-cols-2
-              lg:grid-cols-4
-              gap-6
-            "
+    grid
+    grid-cols-1
+    md:grid-cols-2
+    lg:grid-cols-4
+    gap-8
+  "
           >
 
             {products.map(

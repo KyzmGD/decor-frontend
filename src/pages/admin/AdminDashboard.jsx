@@ -195,6 +195,93 @@ function AdminDashboard() {
   return (
    <MainLayout>
     <div
+  className="
+    grid
+    md:grid-cols-4
+    gap-6
+    mb-10
+  "
+>
+
+  <div
+    className="
+      bg-white
+      p-6
+      rounded-xl
+      shadow
+    "
+  >
+    <h3>Total Products</h3>
+    <p
+      className="
+        text-3xl
+        font-bold
+      "
+    >
+      {products.length}
+    </p>
+  </div>
+
+  <div
+    className="
+      bg-white
+      p-6
+      rounded-xl
+      shadow
+    "
+  >
+    <h3>Categories</h3>
+    <p
+      className="
+        text-3xl
+        font-bold
+      "
+    >
+      {categories.length}
+    </p>
+  </div>
+
+  <div
+    className="
+      bg-white
+      p-6
+      rounded-xl
+      shadow
+    "
+  >
+    <h3>Orders</h3>
+    <p
+      className="
+        text-3xl
+        font-bold
+      "
+    >
+      {orders.length}
+    </p>
+  </div>
+
+  <div
+    className="
+      bg-white
+      p-6
+      rounded-xl
+      shadow
+    "
+  >
+    <h3>Revenue</h3>
+    <p
+      className="
+        text-3xl
+        font-bold
+      "
+    >
+      $
+      {revenue}
+    </p>
+  </div>
+
+</div>
+    <div
       className="
         max-w-7xl
         mx-auto
