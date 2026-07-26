@@ -24,6 +24,10 @@ import {
   getProductById,
   getProducts
 } from "../api/productApi";
+import {
+  getReviews,
+  createReview
+} from "../api/reviewApi";
 import AuthContext from "../context/AuthContext";
 import CartContext from "../context/CartContext";
 import LanguageContext from "../context/LanguageContext";
@@ -35,7 +39,7 @@ import { formatCurrency } from "../utils/currency";
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
   const { t } = useContext(LanguageContext);
   const {
@@ -60,26 +64,19 @@ function ProductDetail() {
 
         const [
           productResponse,
-          productsResponse
+          productsResponse,
+          reviewsResponse
         ] = await Promise.all([
           getProductById(id),
-          getProducts()
+          getProducts(),
+          getReviews(id)
         ]);
 
         setProduct(productResponse.data);
         setAllProducts(productsResponse.data || []);
+        setReviews(reviewsResponse.data || []);
         setSelectedImage(0);
         setQuantity(1);
-
-        try {
-          setReviews(
-            JSON.parse(
-              localStorage.getItem(`reviews:${id}`) || "[]"
-            )
-          );
-        } catch {
-          setReviews([]);
-        }
       } catch (error) {
         console.error("Load product detail error:", error);
       } finally {
@@ -187,30 +184,29 @@ function ProductDetail() {
     );
   };
 
-  const handleReview = (event) => {
+  const handleReview = async (event) => {
     event.preventDefault();
 
     if (!requireLogin() || !comment.trim()) {
       return;
     }
 
-    const review = {
-      id: Date.now(),
-      name: user.fullname || user.name || user.email,
-      rating,
-      comment: comment.trim(),
-      createdAt: new Date().toISOString()
-    };
+    try {
+      const res = await createReview(
+        id,
+        { rating, comment: comment.trim() },
+        token
+      );
 
-    const nextReviews = [review, ...reviews];
-    setReviews(nextReviews);
-    localStorage.setItem(
-      `reviews:${id}`,
-      JSON.stringify(nextReviews)
-    );
-    setComment("");
-    setRating(5);
-    toast.success(t("user.reviewSuccess"));
+      setReviews((prev) => [res.data, ...prev]);
+      setComment("");
+      setRating(5);
+      toast.success(t("user.reviewSuccess"));
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Gửi đánh giá thất bại"
+      );
+    }
   };
 
   const handleNewsletter = (event) => {
@@ -285,21 +281,26 @@ function ProductDetail() {
               {formatCurrency(product.price)}
             </p>
 
-            <div className="mt-6 flex items-center gap-2">
+          <div className="mt-6 flex items-center gap-2">
               <div className="flex text-[#A98252]">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    size={17}
-                    fill={
-                      star <=
-                      (reviews[0]?.rating || 5)
-                        ? "currentColor"
-                        : "none"
-                    }
-                  />
-                ))}
+                {(() => {
+                  const avg = reviews.length
+                    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+                    : 0;
+                  return [1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={17}
+                      fill={star <= Math.round(avg) ? "currentColor" : "none"}
+                    />
+                  ));
+                })()}
               </div>
+              {reviews.length > 0 && (
+                <span className="text-sm font-semibold text-[#A98252]">
+                  {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                </span>
+              )}
               <span className="text-sm text-stone-500">
                 ({reviews.length} {t("user.reviews")})
               </span>
