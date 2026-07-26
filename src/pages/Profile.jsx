@@ -5,6 +5,7 @@ import {
 import {
   MapPin,
   Save,
+  Upload,
   UserRound
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -15,6 +16,15 @@ import {
 import AuthContext from "../context/AuthContext";
 import LanguageContext from "../context/LanguageContext";
 import MainLayout from "../layouts/MainLayout";
+
+const PRESET_AVATARS = [
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Willow",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Oliver",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Luna",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Leo",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Mia",
+  "https://api.dicebear.com/9.x/adventurer/svg?seed=Max"
+];
 
 function Profile() {
   const {
@@ -30,7 +40,8 @@ function Profile() {
     phone: user?.phone || "",
     city: user?.city || "",
     district: user?.district || "",
-    address: user?.address || ""
+    address: user?.address || "",
+    avatar: user?.avatar || ""
   });
   const [saving, setSaving] = useState(false);
 
@@ -54,7 +65,8 @@ function Profile() {
           phone: form.phone,
           city: form.city,
           district: form.district,
-          address: form.address
+          address: form.address,
+          avatar: form.avatar
         },
         token
       );
@@ -75,6 +87,58 @@ function Profile() {
     }
   };
 
+  const handleAvatarUpload = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("user.avatarImageOnly"));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const sourceImage = new Image();
+      sourceImage.onload = () => {
+        const maxSize = 320;
+        const scale = Math.min(
+          maxSize / sourceImage.width,
+          maxSize / sourceImage.height,
+          1
+        );
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(
+          1,
+          Math.round(sourceImage.width * scale)
+        );
+        canvas.height = Math.max(
+          1,
+          Math.round(sourceImage.height * scale)
+        );
+        canvas
+          .getContext("2d")
+          .drawImage(
+            sourceImage,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+        setForm((current) => ({
+          ...current,
+          avatar: canvas.toDataURL("image/jpeg", 0.82)
+        }));
+      };
+      sourceImage.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  };
+
   return (
     <MainLayout>
       <div className="mx-auto max-w-6xl px-6 py-12">
@@ -92,9 +156,17 @@ function Profile() {
 
         <div className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="h-fit rounded-3xl bg-[#2B241F] p-7 text-white">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#A98252] text-2xl font-bold">
-              {(user?.fullname || "U").charAt(0).toUpperCase()}
-            </div>
+            {form.avatar ? (
+              <img
+                src={form.avatar}
+                alt=""
+                className="h-20 w-20 rounded-full border-2 border-white/30 object-cover"
+              />
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#A98252] text-2xl font-bold">
+                {(user?.fullname || "U").charAt(0).toUpperCase()}
+              </div>
+            )}
             <h2 className="mt-5 text-xl font-bold">
               {user?.fullname}
             </h2>
@@ -108,6 +180,74 @@ function Profile() {
           </aside>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <section className="rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 dark:border-stone-700 dark:bg-stone-900">
+              <div className="flex items-center gap-3">
+                <UserRound size={22} className="text-[#A98252]" />
+                <h2 className="text-xl font-bold">
+                  {t("user.profilePicture")}
+                </h2>
+              </div>
+              <p className="mt-2 text-sm text-stone-500">
+                {t("user.profilePictureHint")}
+              </p>
+
+              <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
+                {form.avatar ? (
+                  <img
+                    src={form.avatar}
+                    alt=""
+                    className="h-28 w-28 shrink-0 rounded-full border-4 border-[#EDE6DC] object-cover"
+                  />
+                ) : (
+                  <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-[#EDE6DC] text-3xl font-bold text-[#7A5A35]">
+                    {(form.fullname || "U").charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                <div>
+                  <p className="mb-3 text-sm font-semibold">
+                    {t("user.choosePresetAvatar")}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {PRESET_AVATARS.map((avatar) => (
+                      <button
+                        key={avatar}
+                        type="button"
+                        onClick={() =>
+                          setForm((current) => ({
+                            ...current,
+                            avatar
+                          }))
+                        }
+                        className={`rounded-full border-2 p-0.5 ${
+                          form.avatar === avatar
+                            ? "border-[#A98252]"
+                            : "border-transparent"
+                        }`}
+                      >
+                        <img
+                          src={avatar}
+                          alt=""
+                          className="h-11 w-11 rounded-full bg-stone-100"
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-stone-300 px-4 py-2.5 text-sm font-semibold hover:border-[#A98252] hover:text-[#7A5A35] dark:border-stone-600">
+                    <Upload size={17} />
+                    {t("user.uploadOwnAvatar")}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
+              </div>
+            </section>
+
             <section className="rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 dark:border-stone-700 dark:bg-stone-900">
               <div className="flex items-center gap-3">
                 <UserRound size={22} className="text-[#A98252]" />

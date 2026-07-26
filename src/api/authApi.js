@@ -25,20 +25,6 @@ export const login = (
   );
 };
 
-export const getProfile = (
-  token
-) => {
-  return axios.get(
-    `${API_URL}/profile`,
-    {
-      headers: {
-        Authorization:
-          `Bearer ${token}`
-      }
-    }
-  );
-};
-
 export const updateProfile = (
   data,
   token

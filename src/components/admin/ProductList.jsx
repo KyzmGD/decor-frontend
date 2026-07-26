@@ -3,14 +3,23 @@ import {
   Trash2,
   Package
 } from "lucide-react";
-import { useContext } from "react";
+import {
+  Fragment,
+  useContext
+} from "react";
 import LanguageContext from "../../context/LanguageContext";
 import { formatCurrency } from "../../utils/currency";
+import ProductForm from "./ProductForm";
 
 function ProductList({
   products,
   onEdit,
-  onDelete
+  onDelete,
+  selectedProduct,
+  categories,
+  onSubmit,
+  onCancel,
+  submitting
 }) {
   const { t } = useContext(LanguageContext);
   return (
@@ -42,8 +51,8 @@ function ProductList({
 
         <tbody className="divide-y divide-slate-100">
           {products.map((product) => (
+            <Fragment key={product.id}>
             <tr
-              key={product.id}
               className="transition-colors duration-200 hover:bg-[#F7F0E6] hover:shadow-[inset_3px_0_0_#A98252] dark:hover:bg-[#2B241F]"
             >
               <td className="px-6 py-4">
@@ -119,6 +128,33 @@ function ProductList({
                 </div>
               </td>
             </tr>
+            {selectedProduct?.id === product.id && (
+              <tr>
+                <td
+                  colSpan="5"
+                  className="bg-slate-50 px-4 py-5 dark:bg-slate-950/70"
+                >
+                  <div className="mx-auto max-w-4xl rounded-2xl border border-[#A98252]/40 bg-white pt-6 shadow-sm dark:border-[#C5A26B]/50 dark:bg-slate-900">
+                    <div className="px-6">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                        {t("admin.editProduct")}: {product.name}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        {t("admin.formDescription")}
+                      </p>
+                    </div>
+                    <ProductForm
+                      selectedProduct={selectedProduct}
+                      categories={categories}
+                      onSubmit={onSubmit}
+                      onCancel={onCancel}
+                      submitting={submitting}
+                    />
+                  </div>
+                </td>
+              </tr>
+            )}
+            </Fragment>
           ))}
         </tbody>
       </table>

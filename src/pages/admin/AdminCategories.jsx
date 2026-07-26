@@ -34,6 +34,7 @@ function AdminCategories() {
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -74,6 +75,7 @@ function AdminCategories() {
 
   const handleSubmit = async (data) => {
     try {
+      setSubmitting(true);
       setError("");
 
       if (selectedCategory) {
@@ -97,6 +99,8 @@ function AdminCategories() {
         error.response?.data?.message ||
         t("admin.saveCategoryError")
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -202,10 +206,10 @@ function AdminCategories() {
         </div>
       )}
 
-      {showForm && (
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      {showForm && !selectedCategory && (
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
               {selectedCategory
                 ? t("admin.editCategory")
                 : t("admin.addCategory")}
@@ -226,6 +230,11 @@ function AdminCategories() {
           <CategoryForm
             selectedCategory={selectedCategory}
             onSubmit={handleSubmit}
+            onCancel={() => {
+              setShowForm(false);
+              setSelectedCategory(null);
+            }}
+            submitting={submitting}
           />
         </div>
       )}
@@ -266,6 +275,13 @@ function AdminCategories() {
             categories={filteredCategories}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            selectedCategory={selectedCategory}
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              setShowForm(false);
+              setSelectedCategory(null);
+            }}
+            submitting={submitting}
           />
         )}
       </div>

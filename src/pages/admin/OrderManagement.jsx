@@ -11,7 +11,8 @@ import {
   RefreshCcw,
   Eye,
   AlertTriangle,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from "lucide-react";
 
 import AuthContext from "../../context/AuthContext";
@@ -52,10 +53,13 @@ function OrderManagement() {
   const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [needsConfirmationOnly, setNeedsConfirmationOnly] =
+    useState(false);
 
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -113,9 +117,23 @@ function OrderManagement() {
         statusFilter === "all" ||
         order.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      const needsConfirmation =
+        order.status === "Pending" &&
+        order.requiresStockConfirmation &&
+        !order.stockConfirmed;
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        (!needsConfirmationOnly || needsConfirmation)
+      );
     });
-  }, [orders, search, statusFilter]);
+  }, [
+    orders,
+    search,
+    statusFilter,
+    needsConfirmationOnly
+  ]);
 
   const handleStatusChange = async (
     orderId,
@@ -125,7 +143,7 @@ function OrderManagement() {
       setUpdatingId(orderId);
       setError("");
 
-      await updateOrderStatus(
+      const response = await updateOrderStatus(
         orderId,
         nextStatus,
         token
@@ -136,7 +154,7 @@ function OrderManagement() {
           order.id === orderId
             ? {
                 ...order,
-                status: nextStatus
+                ...response.data
               }
             : order
         )
@@ -247,6 +265,16 @@ function OrderManagement() {
     }
   };
 
+  const formatDateTime = (value) => {
+    if (!value) {
+      return "—";
+    }
+
+    return new Date(value).toLocaleString(
+      language === "vi" ? "vi-VN" : "en-US"
+    );
+  };
+
   return (
     <AdminLayout
       title={t("admin.orderManagement")}
@@ -310,6 +338,18 @@ function OrderManagement() {
               {t("admin.cancelled")}
             </option>
           </select>
+
+          <label className="flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+            <input
+              type="checkbox"
+              checked={needsConfirmationOnly}
+              onChange={(event) =>
+                setNeedsConfirmationOnly(event.target.checked)
+              }
+              className="h-4 w-4 accent-[#A98252]"
+            />
+            {t("admin.needsConfirmationOnly")}
+          </label>
         </div>
 
         <button
@@ -410,6 +450,7 @@ function OrderManagement() {
                     0;
 
                   const needsConfirmation =
+                    order.status === "Pending" &&
                     order.requiresStockConfirmation &&
                     !order.stockConfirmed;
 
@@ -434,33 +475,46 @@ function OrderManagement() {
                       </td>
 
                       <td className="px-6 py-4">
-                        <div>
-                          <p className="font-semibold text-slate-900">
-                            {customerName}
-                          </p>
-
-                          <p className="mt-1 text-sm text-slate-500">
-                            {customerEmail}
-                          </p>
-
-                          {needsConfirmation && (
-                            <div className="mt-2 flex items-start gap-1.5 text-xs font-semibold text-amber-700">
-                              <AlertTriangle
-                                size={14}
-                                className="mt-0.5 shrink-0"
-                              />
-                              <span>
-                                {t("admin.lowStockWarning")}
-                                {lowStockItems.length > 0 &&
-                                  `: ${lowStockItems
-                                    .map(
-                                      (item) =>
-                                        `${item.Product?.name} (${item.Product?.stock})`
-                                    )
-                                    .join(", ")}`}
-                              </span>
+                        <div className="flex items-start gap-3">
+                          {order.User?.avatar ? (
+                            <img
+                              src={order.User.avatar}
+                              alt=""
+                              className="h-10 w-10 shrink-0 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EDE6DC] font-bold text-[#7A5A35]">
+                              {customerName.charAt(0).toUpperCase()}
                             </div>
                           )}
+                          <div className="min-w-0">
+                            <p className="font-semibold text-slate-900">
+                              {customerName}
+                            </p>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                              {customerEmail}
+                            </p>
+
+                            {needsConfirmation && (
+                              <div className="mt-2 flex items-start gap-1.5 text-xs font-semibold text-amber-700">
+                                <AlertTriangle
+                                  size={14}
+                                  className="mt-0.5 shrink-0"
+                                />
+                                <span>
+                                  {t("admin.lowStockWarning")}
+                                  {lowStockItems.length > 0 &&
+                                    `: ${lowStockItems
+                                      .map(
+                                        (item) =>
+                                          `${item.Product?.name} (${item.Product?.stock})`
+                                      )
+                                      .join(", ")}`}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </td>
 
@@ -480,13 +534,7 @@ function OrderManagement() {
                       </td>
 
                       <td className="px-6 py-4 text-sm text-slate-600">
-                        {order.createdAt
-                          ? new Date(
-                              order.createdAt
-                            ).toLocaleDateString(
-                              language === "vi" ? "vi-VN" : "en-US"
-                            )
-                          : "—"}
+                        {formatDateTime(order.createdAt)}
                       </td>
 
                       <td className="px-6 py-4">
@@ -543,6 +591,7 @@ function OrderManagement() {
 
                           <button
                             type="button"
+                            onClick={() => setSelectedOrder(order)}
                             className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:border-[#A98252] hover:bg-[#F1E6D7] hover:text-[#7A5A35] dark:border-stone-700 dark:text-stone-300 dark:hover:border-[#C5A26B] dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
                             title={t("admin.viewDetails")}
                           >
@@ -558,6 +607,149 @@ function OrderManagement() {
           </div>
         )}
       </div>
+
+      {selectedOrder && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="order-detail-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedOrder(null);
+            }
+          }}
+        >
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
+              <div>
+                <p className="text-sm font-medium text-[#A98252]">
+                  {t("admin.orderCode")} #{selectedOrder.id}
+                </p>
+                <h2
+                  id="order-detail-title"
+                  className="mt-1 text-xl font-bold text-slate-900"
+                >
+                  {t("admin.orderDetails")}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedOrder(null)}
+                className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-100"
+                aria-label={t("common.close")}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-6 p-6">
+              <section className="grid gap-4 rounded-xl bg-slate-50 p-5 sm:grid-cols-2 dark:bg-stone-800">
+                <div>
+                  <p className="text-xs font-semibold uppercase text-slate-500 dark:text-stone-400">
+                    {t("admin.customer")}
+                  </p>
+                  <p className="mt-1 font-semibold text-slate-900 dark:text-stone-100">
+                    {selectedOrder.recipientName ||
+                      selectedOrder.User?.fullname ||
+                      t("admin.unknownCustomer")}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-stone-300">
+                    {selectedOrder.User?.email || "—"}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-stone-300">
+                    {selectedOrder.phone ||
+                      selectedOrder.User?.phone ||
+                      "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase text-slate-500 dark:text-stone-400">
+                    {t("admin.deliveryAddress")}
+                  </p>
+                  <p className="mt-1 leading-6 text-slate-800 dark:text-stone-100">
+                    {[
+                      selectedOrder.address,
+                      selectedOrder.User?.district,
+                      selectedOrder.User?.city
+                    ].filter(Boolean).join(", ") || "—"}
+                  </p>
+                </div>
+              </section>
+
+              <section>
+                <h3 className="font-bold text-slate-900">
+                  {t("admin.orderTimeline")}
+                </h3>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {[
+                    [t("admin.orderedAt"), selectedOrder.createdAt],
+                    [t("admin.confirmedAt"), selectedOrder.confirmedAt || selectedOrder.stockConfirmedAt],
+                    [t("admin.shippingStartedAt"), selectedOrder.shippingStartedAt],
+                    [t("admin.deliveredAt"), selectedOrder.deliveredAt]
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-xl border border-slate-200 p-4"
+                    >
+                      <p className="text-xs font-semibold uppercase text-slate-500">
+                        {label}
+                      </p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {formatDateTime(value)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h3 className="font-bold text-slate-900">
+                  {t("admin.orderedProducts")}
+                </h3>
+                <div className="mt-3 divide-y divide-slate-100 rounded-xl border border-slate-200">
+                  {(selectedOrder.OrderItems || []).map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-4 p-4"
+                    >
+                      {item.Product?.image && (
+                        <img
+                          src={item.Product.image}
+                          alt=""
+                          className="h-14 w-14 rounded-lg object-cover"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-semibold text-slate-900">
+                          {item.Product?.name || `#${item.ProductId}`}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {t("common.quantity")}: {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-slate-900">
+                        {formatCurrency(
+                          Number(item.price) * Number(item.quantity)
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="flex items-center justify-between border-t border-slate-200 pt-5">
+                <span className="font-semibold text-slate-600">
+                  {t("admin.total")}
+                </span>
+                <span className="text-xl font-bold text-[#A98252]">
+                  {formatCurrency(selectedOrder.totalPrice || 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
