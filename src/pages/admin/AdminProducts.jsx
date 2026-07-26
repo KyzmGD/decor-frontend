@@ -123,11 +123,6 @@ function AdminProducts() {
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setShowForm(true);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
   };
 
   const handleDelete = async (id) => {
@@ -279,7 +274,7 @@ const { t } =
         </div>
       )}
 
-      {showForm && (
+      {showForm && !selectedProduct && (
         <div className="
   rounded-2xl
   border
@@ -290,9 +285,9 @@ const { t } =
   dark:border-slate-800
   dark:bg-slate-900
 ">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between px-6 pt-6">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                 {selectedProduct
                   ? t("admin.editProduct")
                   : t("admin.addProduct")}
@@ -354,6 +349,11 @@ const { t } =
             products={filteredProducts}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            selectedProduct={selectedProduct}
+            categories={categories}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            submitting={submitting}
           />
         )}
       </div>

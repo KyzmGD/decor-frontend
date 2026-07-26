@@ -1,119 +1,102 @@
 import {
   useContext,
-  useState,
-  useEffect
+  useEffect,
+  useState
 } from "react";
+import {
+  Save,
+  X
+} from "lucide-react";
+
 import LanguageContext from "../../context/LanguageContext";
 
 function CategoryForm({
   selectedCategory,
-  onSubmit
+  onSubmit,
+  onCancel,
+  submitting = false
 }) {
   const { t } = useContext(LanguageContext);
-
-  const [name, setName] =
-    useState("");
-
-  const [
-    description,
-    setDescription
-  ] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
+    setName(selectedCategory?.name || "");
+    setDescription(selectedCategory?.description || "");
+  }, [selectedCategory]);
 
-  if (selectedCategory) {
-
-    setName(
-      selectedCategory.name
-    );
-
-    setDescription(
-      selectedCategory.description || ""
-    );
-
-  } else {
-
-    setName("");
-    setDescription("");
-
-  }
-
-}, [selectedCategory]);
-
-  const handleSubmit = (
-    e
-  ) => {
-
-    e.preventDefault();
-
+  const handleSubmit = (event) => {
+    event.preventDefault();
     onSubmit({
-      name,
-      description
+      name: name.trim(),
+      description: description.trim()
     });
-
-    setName("");
-    setDescription("");
   };
 
+  const inputClasses =
+    "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#A98252] focus:ring-2 focus:ring-[#A98252]/15 dark:border-slate-700 dark:bg-slate-950 dark:text-white";
+
   return (
-    <form
-      onSubmit={
-        handleSubmit
-      }
-      className="
-        border
-        p-4
-        mb-6
-      "
-    >
+    <form onSubmit={handleSubmit}>
+      <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">
+        {t("admin.requiredFields")}
+      </p>
 
-      <input
-        type="text"
-        placeholder={t("common.name")}
-        value={name}
-        onChange={(e) =>
-          setName(
-            e.target.value
-          )
-        }
-        className="
-          border
-          p-2
-          w-full
-          mb-3
-        "
-      />
+      <div className="space-y-5">
+        <label className="block">
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {t("common.name")} <span className="text-red-500">*</span>
+          </span>
+          <input
+            required
+            autoFocus
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder={t("admin.categoryNameHint")}
+            className={inputClasses}
+          />
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            {t("admin.categoryNameHelp")}
+          </p>
+        </label>
 
-      <textarea
-        placeholder={t("common.description")}
-        value={description}
-        onChange={(e) =>
-          setDescription(
-            e.target.value
-          )
-        }
-        className="
-          border
-          p-2
-          w-full
-          mb-3
-        "
-      />
+        <label className="block">
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {t("common.description")}
+          </span>
+          <textarea
+            rows="4"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder={t("admin.categoryDescriptionHint")}
+            className={`${inputClasses} resize-y`}
+          />
+        </label>
+      </div>
 
-      <button
-        type="submit"
-        className="
-          bg-black
-          text-white
-          px-4
-          py-2
-        "
-      >
-        {selectedCategory
-          ? `${t("common.update")} ${t("common.categories")}`
-          : `${t("common.create")} ${t("common.categories")}`}
-      </button>
-
+      <div className="mt-6 flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end dark:border-slate-700">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={submitting}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+        >
+          <X size={18} />
+          {t("common.cancel")}
+        </button>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#A98252] dark:hover:bg-[#BD996B]"
+        >
+          <Save size={18} />
+          {submitting
+            ? t("common.loading")
+            : selectedCategory
+              ? t("admin.updateCategory")
+              : t("admin.createCategory")}
+        </button>
+      </div>
     </form>
   );
 }

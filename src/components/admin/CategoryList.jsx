@@ -3,13 +3,21 @@ import {
   Pencil,
   Trash2
 } from "lucide-react";
-import { useContext } from "react";
+import {
+  Fragment,
+  useContext
+} from "react";
 import LanguageContext
   from "../../context/LanguageContext";
+import CategoryForm from "./CategoryForm";
 function CategoryList({
   categories,
   onEdit,
-  onDelete
+  onDelete,
+  selectedCategory,
+  onSubmit,
+  onCancel,
+  submitting
 }) {
   const { t } = useContext(LanguageContext);
   if (!categories?.length) {
@@ -50,8 +58,8 @@ function CategoryList({
 
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {categories.map((category) => (
+            <Fragment key={category.id}>
             <tr
-                key={category.id}
   className="
     transition-colors
     duration-200
@@ -155,6 +163,32 @@ function CategoryList({
                 </div>
               </td>
             </tr>
+            {selectedCategory?.id === category.id && (
+              <tr>
+                <td
+                  colSpan="3"
+                  className="bg-slate-50 px-4 py-5 dark:bg-slate-950/70"
+                >
+                  <div className="mx-auto max-w-3xl rounded-2xl border border-[#A98252]/40 bg-white p-6 shadow-sm dark:border-[#C5A26B]/50 dark:bg-slate-900">
+                    <div className="mb-5">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                        {t("admin.editCategory")}: {category.name}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        {t("admin.formDescription")}
+                      </p>
+                    </div>
+                    <CategoryForm
+                      selectedCategory={selectedCategory}
+                      onSubmit={onSubmit}
+                      onCancel={onCancel}
+                      submitting={submitting}
+                    />
+                  </div>
+                </td>
+              </tr>
+            )}
+            </Fragment>
           ))}
         </tbody>
       </table>
