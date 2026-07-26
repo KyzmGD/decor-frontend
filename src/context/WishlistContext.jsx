@@ -1,28 +1,36 @@
 import {
   createContext,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
   useState
 } from "react";
+import AuthContext from "./AuthContext";
+import {
+  getWishlist,
+  addToWishlist as addToWishlistApi,
+  removeFromWishlist as removeFromWishlistApi,
+  clearWishlistApi
+} from "../api/wishlistApi";
 
 const WishlistContext = createContext();
 
 export function WishlistProvider({ children }) {
-  const [wishlistItems, setWishlistItems] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("wishlist") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const { user, token } = useContext(AuthContext);
+  const [wishlistItems, setWishlistItems] = useState([]);
 
-  const updateItems = useCallback((updater) => {
-    setWishlistItems((currentItems) => {
-      const nextItems = updater(currentItems);
-      localStorage.setItem("wishlist", JSON.stringify(nextItems));
-      return nextItems;
-    });
-  }, []);
+  // Load wishlist từ DB khi user đăng nhập
+  useEffect(() => {
+    if (!user || !token) {
+      setWishlistItems([]);
+      return;
+    }
+
+    getWishlist(token)
+      .then((res) => setWishlistItems(res.data || []))
+      .catch(() => setWishlistItems([]));
+  }, [user, token]);
 
   const isInWishlist = useCallback(
     (productId) =>
@@ -31,21 +39,38 @@ export function WishlistProvider({ children }) {
   );
 
   const addToWishlist = useCallback(
-    (product) =>
-      updateItems((items) =>
-        items.some((item) => item.id === product.id)
-          ? items
-          : [...items, product]
-      ),
-    [updateItems]
+    async (product) => {
+      if (isInWishlist(product.id)) return;
+
+      // Cập nhật UI ngay lập tức (optimistic update)
+      setWishlistItems((items) => [...items, product]);
+
+      try {
+        await addToWishlistApi(product.id, token);
+      } catch {
+        // Nếu lỗi, rollback
+        setWishlistItems((items) =>
+          items.filter((item) => item.id !== product.id)
+        );
+      }
+    },
+    [isInWishlist, token]
   );
 
   const removeFromWishlist = useCallback(
-    (productId) =>
-      updateItems((items) =>
+    async (productId) => {
+      const prev = wishlistItems;
+      setWishlistItems((items) =>
         items.filter((item) => item.id !== productId)
-      ),
-    [updateItems]
+      );
+
+      try {
+        await removeFromWishlistApi(productId, token);
+      } catch {
+        setWishlistItems(prev);
+      }
+    },
+    [wishlistItems, token]
   );
 
   const toggleWishlist = useCallback(
@@ -59,10 +84,14 @@ export function WishlistProvider({ children }) {
     [addToWishlist, isInWishlist, removeFromWishlist]
   );
 
-  const clearWishlist = useCallback(
-    () => updateItems(() => []),
-    [updateItems]
-  );
+  const clearWishlist = useCallback(async () => {
+    setWishlistItems([]);
+    try {
+      await clearWishlistApi(token);
+    } catch {
+      // silent fail
+    }
+  }, [token]);
 
   const value = useMemo(
     () => ({
