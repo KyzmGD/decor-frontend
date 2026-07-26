@@ -13,9 +13,6 @@ const getConfig = (token) => ({
 export const getProducts = () =>
   axios.get(API_URL);
 
-export const getProduct = (id) =>
-  axios.get(`${API_URL}/${id}`);
-
 export const createProduct = (
   data,
   token
