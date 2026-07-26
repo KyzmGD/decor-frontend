@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/wishlist`;
+const API_URL = "https://decor-backend-z1ve.onrender.com/api/wishlist";
 
 const getConfig = (token) => ({
   headers: { Authorization: `Bearer ${token}` }
