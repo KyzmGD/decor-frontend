@@ -5,8 +5,10 @@ import {
   useState
 } from "react";
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Heart,
   Mail,
   Minus,
@@ -56,6 +58,7 @@ function ProductDetail() {
   const [comment, setComment] = useState("");
   const [reviews, setReviews] = useState([]);
   const [email, setEmail] = useState("");
+  const [thumbnailPage, setThumbnailPage] = useState(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -76,6 +79,7 @@ function ProductDetail() {
         setAllProducts(productsResponse.data || []);
         setReviews(reviewsResponse.data || []);
         setSelectedImage(0);
+        setThumbnailPage(0);
         setQuantity(1);
       } catch (error) {
         console.error("Load product detail error:", error);
@@ -100,6 +104,22 @@ function ProductDetail() {
       [product.image, ...images].filter(Boolean)
     )];
   }, [product]);
+
+  const thumbnailPageCount = Math.ceil(gallery.length / 6);
+  const visibleThumbnails = gallery.slice(
+    thumbnailPage * 6,
+    thumbnailPage * 6 + 6
+  );
+
+  const showThumbnailPage = (nextPage) => {
+    const boundedPage = Math.min(
+      Math.max(nextPage, 0),
+      thumbnailPageCount - 1
+    );
+
+    setThumbnailPage(boundedPage);
+    setSelectedImage(boundedPage * 6);
+  };
 
   const relatedProducts = useMemo(() => {
     if (!product) {
@@ -229,26 +249,27 @@ function ProductDetail() {
         </nav>
 
         <section className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-          <div className="grid gap-4 sm:grid-cols-[84px_minmax(0,1fr)]">
-            <div className="order-2 flex gap-3 overflow-x-auto sm:order-1 sm:flex-col">
+          <div className="relative flex flex-col gap-4 sm:block sm:pl-[100px]">
+            <div className="order-1 aspect-square overflow-hidden rounded-3xl bg-stone-100 dark:bg-stone-800">
+              <img
+                src={gallery[selectedImage] || product.image}
+                alt={product.name}
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="order-2 flex gap-3 overflow-x-auto sm:hidden">
               {gallery.map((image, index) => (
                 <button
                   key={`${image}-${index}`}
                   type="button"
                   onClick={() => setSelectedImage(index)}
-                  className={`
-                    h-20
-                    w-20
-                    shrink-0
-                    overflow-hidden
-                    rounded-xl
-                    border-2
-                    ${
-                      selectedImage === index
-                        ? "border-[#A98252]"
-                        : "border-stone-200 dark:border-stone-700"
-                    }
-                  `}
+                  className={[
+                    "h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2",
+                    selectedImage === index
+                      ? "border-[#A98252]"
+                      : "border-stone-200 dark:border-stone-700"
+                  ].join(" ")}
                 >
                   <img
                     src={image}
@@ -259,12 +280,74 @@ function ProductDetail() {
               ))}
             </div>
 
-            <div className="order-1 overflow-hidden rounded-3xl bg-stone-100 sm:order-2 dark:bg-stone-800">
-              <img
-                src={gallery[selectedImage] || product.image}
-                alt={product.name}
-                className="aspect-square h-full w-full object-cover"
-              />
+            <div
+              className={[
+                "absolute inset-y-0 left-0 hidden w-20 sm:grid",
+                thumbnailPageCount > 1
+                  ? "grid-rows-[32px_minmax(0,1fr)_32px] gap-2"
+                  : "grid-rows-1"
+              ].join(" ")}
+            >
+              {thumbnailPageCount > 1 && (
+                <button
+                  type="button"
+                  onClick={() => showThumbnailPage(thumbnailPage - 1)}
+                  disabled={thumbnailPage === 0}
+                  aria-label={t("user.previousProductImages")}
+                  className="flex h-8 w-full items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 transition hover:border-[#A98252] hover:bg-[#A98252] hover:text-white disabled:cursor-not-allowed disabled:opacity-35 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200"
+                >
+                  <ChevronUp size={18} />
+                </button>
+              )}
+
+              <div
+                className="grid min-h-0 gap-2"
+                style={{
+                  gridTemplateRows: "repeat(6, minmax(0, 1fr))"
+                }}
+              >
+                {visibleThumbnails.map((image, index) => {
+                  const galleryIndex = thumbnailPage * 6 + index;
+
+                  return (
+                  <button
+                    key={`${image}-${galleryIndex}`}
+                    type="button"
+                    onClick={() => setSelectedImage(galleryIndex)}
+                    className={`
+                      w-20
+                      min-h-0
+                      overflow-hidden
+                      rounded-xl
+                      border-2
+                      ${
+                        selectedImage === galleryIndex
+                          ? "border-[#A98252]"
+                          : "border-stone-200 dark:border-stone-700"
+                      }
+                    `}
+                  >
+                    <img
+                      src={image}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                  );
+                })}
+              </div>
+
+              {thumbnailPageCount > 1 && (
+                <button
+                  type="button"
+                  onClick={() => showThumbnailPage(thumbnailPage + 1)}
+                  disabled={thumbnailPage === thumbnailPageCount - 1}
+                  aria-label={t("user.nextProductImages")}
+                  className="flex h-8 w-full items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 transition hover:border-[#A98252] hover:bg-[#A98252] hover:text-white disabled:cursor-not-allowed disabled:opacity-35 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200"
+                >
+                  <ChevronDown size={18} />
+                </button>
+              )}
             </div>
           </div>
 

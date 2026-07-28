@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -6,6 +7,9 @@ import {
 } from "react";
 
 import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   Search,
   ShoppingCart,
   RefreshCcw,
@@ -46,6 +50,25 @@ const ADMIN_TRANSITIONS = {
   Cancelled: []
 };
 
+const LOW_STOCK_THRESHOLD = 5;
+
+const getLowStockItems = (order) =>
+  (order.OrderItems || [])
+    .filter((item) => {
+      const stock = Number(item.Product?.stock);
+      return Number.isFinite(stock) && stock <= LOW_STOCK_THRESHOLD;
+    })
+    .map((item) => {
+      const stock = Number(item.Product.stock);
+      const quantity = Number(item.quantity) || 0;
+
+      return {
+        ...item,
+        stock,
+        remainingAfterConfirmation: Math.max(stock - quantity, 0)
+      };
+    });
+
 function OrderManagement() {
   const { token } = useContext(AuthContext);
   const { t, language } = useContext(LanguageContext);
@@ -55,6 +78,10 @@ function OrderManagement() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [needsConfirmationOnly, setNeedsConfirmationOnly] =
     useState(false);
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: null
+  });
 
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
@@ -62,11 +89,7 @@ function OrderManagement() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -84,12 +107,16 @@ function OrderManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t, token]);
+
+  useEffect(() => {
+    Promise.resolve().then(loadOrders);
+  }, [loadOrders]);
 
   const filteredOrders = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
-    return orders.filter((order) => {
+    const matchingOrders = orders.filter((order) => {
       const customerName =
         order.recipientName ||
         order.User?.fullname ||
@@ -128,12 +155,75 @@ function OrderManagement() {
         (!needsConfirmationOnly || needsConfirmation)
       );
     });
+
+    if (!sortConfig.key || !sortConfig.direction) {
+      return matchingOrders;
+    }
+
+    const direction = sortConfig.direction === "asc" ? 1 : -1;
+    const getSortValue = (order) => {
+      switch (sortConfig.key) {
+        case "total":
+          return Number(
+            order.totalPrice ||
+              order.totalAmount ||
+              order.total ||
+              0
+          );
+        case "status":
+          return ORDER_STATUSES.indexOf(order.status);
+        case "createdAt":
+          return new Date(order.createdAt || 0).getTime();
+        default:
+          return 0;
+      }
+    };
+
+    return [...matchingOrders].sort(
+      (first, second) =>
+        (getSortValue(first) - getSortValue(second)) * direction
+    );
   }, [
     orders,
     search,
     statusFilter,
-    needsConfirmationOnly
+    needsConfirmationOnly,
+    sortConfig
   ]);
+
+  const handleSort = (key) => {
+    setSortConfig((current) => {
+      if (current.key !== key) {
+        return { key, direction: "desc" };
+      }
+
+      if (current.direction === "desc") {
+        return { key, direction: "asc" };
+      }
+
+      return { key: null, direction: null };
+    });
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+      return <ArrowUpDown size={14} />;
+    }
+
+    return sortConfig.direction === "desc"
+      ? <ArrowDown size={14} />
+      : <ArrowUp size={14} />;
+  };
+
+  const getAriaSort = (key) => {
+    if (sortConfig.key !== key) {
+      return "none";
+    }
+
+    return sortConfig.direction === "desc"
+      ? "descending"
+      : "ascending";
+  };
 
   const handleStatusChange = async (
     orderId,
@@ -174,8 +264,21 @@ function OrderManagement() {
     }
   };
 
-  const handleLowStockConfirmation = async (orderId) => {
-    if (!window.confirm(t("admin.confirmLowStockPrompt"))) {
+  const handleLowStockConfirmation = async (order) => {
+    const orderId = order.id;
+    const lowStockSummary = getLowStockItems(order)
+      .map(
+        (item) =>
+          `${item.Product.name}: ${item.stock} ${t("admin.unitsLeft")}`
+      )
+      .join("\n");
+
+    const confirmationMessage = [
+      t("admin.confirmLowStockPrompt"),
+      lowStockSummary
+    ].filter(Boolean).join("\n\n");
+
+    if (!window.confirm(confirmationMessage)) {
       return;
     }
 
@@ -409,15 +512,70 @@ function OrderManagement() {
                   </th>
 
                   <th className="px-6 py-4 font-semibold">
-                    {t("admin.total")}
+                    {t("admin.lowStockItems")}
                   </th>
 
-                  <th className="px-6 py-4 font-semibold">
-                    {t("admin.status")}
+                  <th
+                    className="px-6 py-4 font-semibold"
+                    aria-sort={getAriaSort("total")}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleSort("total")}
+                      aria-label={`${t("admin.total")}: ${
+                        sortConfig.key === "total"
+                          ? sortConfig.direction === "desc"
+                            ? t("admin.sortHighestFirst")
+                            : t("admin.sortLowestFirst")
+                          : t("admin.sortDefault")
+                      }`}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-[#EDE6DC] hover:text-[#7A5A35] focus:outline-none focus:ring-2 focus:ring-[#A98252]/40 dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
+                    >
+                      {t("admin.total")}
+                      {getSortIcon("total")}
+                    </button>
                   </th>
 
-                  <th className="px-6 py-4 font-semibold">
-                    {t("admin.orderDate")}
+                  <th
+                    className="px-6 py-4 font-semibold"
+                    aria-sort={getAriaSort("status")}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleSort("status")}
+                      aria-label={`${t("admin.status")}: ${
+                        sortConfig.key === "status"
+                          ? sortConfig.direction === "desc"
+                            ? t("admin.sortHighestFirst")
+                            : t("admin.sortLowestFirst")
+                          : t("admin.sortDefault")
+                      }`}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-[#EDE6DC] hover:text-[#7A5A35] focus:outline-none focus:ring-2 focus:ring-[#A98252]/40 dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
+                    >
+                      {t("admin.status")}
+                      {getSortIcon("status")}
+                    </button>
+                  </th>
+
+                  <th
+                    className="px-6 py-4 font-semibold"
+                    aria-sort={getAriaSort("createdAt")}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleSort("createdAt")}
+                      aria-label={`${t("admin.orderDate")}: ${
+                        sortConfig.key === "createdAt"
+                          ? sortConfig.direction === "desc"
+                            ? t("admin.sortHighestFirst")
+                            : t("admin.sortLowestFirst")
+                          : t("admin.sortDefault")
+                      }`}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-[#EDE6DC] hover:text-[#7A5A35] focus:outline-none focus:ring-2 focus:ring-[#A98252]/40 dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
+                    >
+                      {t("admin.orderDate")}
+                      {getSortIcon("createdAt")}
+                    </button>
                   </th>
 
                   <th className="px-6 py-4 text-right font-semibold">
@@ -454,11 +612,7 @@ function OrderManagement() {
                     order.requiresStockConfirmation &&
                     !order.stockConfirmed;
 
-                  const lowStockItems =
-                    order.OrderItems?.filter(
-                      (item) =>
-                        Number(item.Product?.stock) <= 5
-                    ) || [];
+                  const lowStockItems = getLowStockItems(order);
 
                   const allowedNextStatuses =
                     ADMIN_TRANSITIONS[order.status] || [];
@@ -496,26 +650,40 @@ function OrderManagement() {
                               {customerEmail}
                             </p>
 
-                            {needsConfirmation && (
-                              <div className="mt-2 flex items-start gap-1.5 text-xs font-semibold text-amber-700">
-                                <AlertTriangle
-                                  size={14}
-                                  className="mt-0.5 shrink-0"
-                                />
-                                <span>
-                                  {t("admin.lowStockWarning")}
-                                  {lowStockItems.length > 0 &&
-                                    `: ${lowStockItems
-                                      .map(
-                                        (item) =>
-                                          `${item.Product?.name} (${item.Product?.stock})`
-                                      )
-                                      .join(", ")}`}
-                                </span>
-                              </div>
-                            )}
                           </div>
                         </div>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        {needsConfirmation ? (
+                          <div className="min-w-56 rounded-xl border border-amber-500/50 bg-amber-500/20 p-3 dark:border-amber-300/50 dark:bg-amber-400/20">
+                            <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+                              <AlertTriangle size={14} />
+                              {t("admin.lowStockWarning")}
+                            </div>
+                            <div className="space-y-2">
+                              {lowStockItems.map((item) => (
+                                <div
+                                  key={item.id}
+                                  className="flex items-start justify-between gap-3 text-sm"
+                                >
+                                  <span className="font-semibold text-slate-800 dark:text-stone-100">
+                                    {item.Product.name}
+                                  </span>
+                                  <span className="shrink-0 text-right font-bold text-amber-800 dark:text-amber-100">
+                                    {item.stock} {t("admin.unitsLeft")}
+                                    <span className="block text-xs font-medium text-amber-700 dark:text-amber-200">
+                                      {item.remainingAfterConfirmation}{" "}
+                                      {t("admin.leftAfterConfirmation")}
+                                    </span>
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
                       </td>
 
                       <td className="px-6 py-4 font-semibold text-slate-900">
@@ -544,7 +712,7 @@ function OrderManagement() {
                               type="button"
                               disabled={confirmingId === order.id}
                               onClick={() =>
-                                handleLowStockConfirmation(order.id)
+                                handleLowStockConfirmation(order)
                               }
                               className="inline-flex items-center gap-2 rounded-lg bg-[#A98252] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#7A5A35] hover:shadow-md disabled:opacity-50"
                             >
@@ -727,6 +895,23 @@ function OrderManagement() {
                         <p className="mt-1 text-sm text-slate-500">
                           {t("common.quantity")}: {item.quantity}
                         </p>
+                        {selectedOrder.status === "Pending" &&
+                          selectedOrder.requiresStockConfirmation &&
+                          !selectedOrder.stockConfirmed &&
+                          Number(item.Product?.stock) <= LOW_STOCK_THRESHOLD && (
+                            <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-amber-700 dark:text-amber-200">
+                              <AlertTriangle size={14} />
+                              {Number(item.Product.stock)}{" "}
+                              {t("admin.unitsLeft")}
+                              {" · "}
+                              {Math.max(
+                                Number(item.Product.stock) -
+                                  Number(item.quantity),
+                                0
+                              )}{" "}
+                              {t("admin.leftAfterConfirmation")}
+                            </p>
+                          )}
                       </div>
                       <p className="font-semibold text-slate-900">
                         {formatCurrency(

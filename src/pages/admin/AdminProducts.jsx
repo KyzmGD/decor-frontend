@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -31,23 +32,24 @@ import LanguageContext
   from "../../context/LanguageContext";
 function AdminProducts() {
   const { token } = useContext(AuthContext);
+  const { t } = useContext(LanguageContext);
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [search, setSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: null
+  });
   const [showForm, setShowForm] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -68,23 +70,50 @@ function AdminProducts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    Promise.resolve().then(loadData);
+  }, [loadData]);
 
   const filteredProducts = useMemo(() => {
     const keyword = search.trim().toLowerCase();
-
-    if (!keyword) {
-      return products;
-    }
-
-    return products.filter((product) => {
+    const matchingProducts = products.filter((product) => {
       return (
+        !keyword ||
         product.name?.toLowerCase().includes(keyword) ||
         product.description?.toLowerCase().includes(keyword) ||
         product.category?.name?.toLowerCase().includes(keyword)
       );
     });
-  }, [products, search]);
+
+    if (!sortConfig.key || !sortConfig.direction) {
+      return matchingProducts;
+    }
+
+    const direction = sortConfig.direction === "asc" ? 1 : -1;
+
+    return [...matchingProducts].sort((a, b) => {
+      const firstValue = Number(a[sortConfig.key]) || 0;
+      const secondValue = Number(b[sortConfig.key]) || 0;
+
+      return (firstValue - secondValue) * direction;
+    });
+  }, [products, search, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig((current) => {
+      if (current.key !== key) {
+        return { key, direction: "asc" };
+      }
+
+      if (current.direction === "asc") {
+        return { key, direction: "desc" };
+      }
+
+      return { key: null, direction: null };
+    });
+  };
 
   const handleSubmit = async (data) => {
     try {
@@ -151,8 +180,6 @@ function AdminProducts() {
     setSelectedProduct(null);
     setShowForm(false);
   };
-const { t } =
-  useContext(LanguageContext);
   return (
     <AdminLayout
   title={t(
@@ -354,6 +381,8 @@ const { t } =
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             submitting={submitting}
+            sortConfig={sortConfig}
+            onSort={handleSort}
           />
         )}
       </div>

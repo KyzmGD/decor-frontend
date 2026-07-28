@@ -6,6 +6,8 @@ import {
 } from "react";
 import {
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Mail
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -23,6 +25,8 @@ function Home() {
   const [categories, setCategories] = useState([]);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentProductPage, setCurrentProductPage] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
 
   useEffect(() => {
     const loadHomeData = async () => {
@@ -56,6 +60,46 @@ function Home() {
     () => [...products].reverse().slice(0, 4),
     [products]
   );
+
+  const allProductPages = useMemo(() => {
+    const pages = [];
+
+    for (let index = 0; index < products.length; index += 5) {
+      pages.push(products.slice(index, index + 5));
+    }
+
+    return pages;
+  }, [products]);
+
+  useEffect(() => {
+    if (carouselPaused || allProductPages.length <= 1) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setCurrentProductPage(
+        (currentPage) =>
+          (currentPage + 1) % allProductPages.length
+      );
+    }, 3000);
+
+    return () => window.clearInterval(intervalId);
+  }, [allProductPages.length, carouselPaused]);
+
+  const showPreviousProducts = () => {
+    setCurrentProductPage(
+      (currentPage) =>
+        (currentPage - 1 + allProductPages.length) %
+        allProductPages.length
+    );
+  };
+
+  const showNextProducts = () => {
+    setCurrentProductPage(
+      (currentPage) =>
+        (currentPage + 1) % allProductPages.length
+    );
+  };
 
   const handleNewsletter = (event) => {
     event.preventDefault();
@@ -177,6 +221,87 @@ function Home() {
           </div>
         </section>
 
+        <section className="border-t border-stone-200 py-16 dark:border-stone-700">
+          <div className="mb-8 flex items-end justify-between">
+            <h2 className="text-3xl font-bold">
+              {t("user.allProducts")}
+            </h2>
+            <Link
+              to="/products"
+              className="hidden items-center gap-2 text-sm font-semibold text-stone-600 hover:text-[#A98252] sm:flex dark:text-stone-300"
+            >
+              {t("user.viewAll")}
+              <ArrowRight size={17} />
+            </Link>
+          </div>
+
+          {loading ? (
+            <p className="py-16 text-center text-stone-500">
+              {t("common.loading")}
+            </p>
+          ) : allProductPages.length ? (
+            <div
+              className="group/carousel relative"
+              onMouseEnter={() => setCarouselPaused(true)}
+              onMouseLeave={() => setCarouselPaused(false)}
+              onFocusCapture={() => setCarouselPaused(true)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  setCarouselPaused(false);
+                }
+              }}
+            >
+              <div className="overflow-hidden">
+                <div
+                  className="flex items-start transition-transform duration-500 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentProductPage * 100}%)`
+                  }}
+                >
+                  {allProductPages.map((page, pageIndex) => (
+                    <div
+                      key={pageIndex}
+                      className="grid w-full shrink-0 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5"
+                    >
+                      {page.map((product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {allProductPages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={showPreviousProducts}
+                    aria-label={t("user.previousProducts")}
+                    className="absolute -left-[60px] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-stone-700 shadow-md backdrop-blur transition hover:border-[#A98252] hover:bg-[#A98252] hover:text-white dark:border-stone-600 dark:bg-stone-800/90 dark:text-stone-100"
+                  >
+                    <ChevronLeft size={22} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={showNextProducts}
+                    aria-label={t("user.nextProducts")}
+                    className="absolute -right-[60px] top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-stone-700 shadow-md backdrop-blur transition hover:border-[#A98252] hover:bg-[#A98252] hover:text-white dark:border-stone-600 dark:bg-stone-800/90 dark:text-stone-100"
+                  >
+                    <ChevronRight size={22} />
+                  </button>
+                </>
+              )}
+            </div>
+          ) : (
+            <p className="py-16 text-center text-stone-500">
+              {t("user.noProducts")}
+            </p>
+          )}
+        </section>
+
         <section className="grid gap-8 border-t border-stone-200 py-16 md:grid-cols-[220px_minmax(0,1fr)] dark:border-stone-700">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A98252]">
@@ -205,7 +330,7 @@ function Home() {
               return (
                 <Link
                   key={category.id}
-                  to="/products"
+                  to={`/products?category=${encodeURIComponent(category.id)}`}
                   className="
                     group
                     relative

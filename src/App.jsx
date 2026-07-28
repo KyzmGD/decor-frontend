@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import {
+  Navigate,
   Routes,
   Route
 } from "react-router-dom";
@@ -61,12 +62,24 @@ function App() {
 
       <Route
         path="/login"
-        element={<Login />}
+        element={
+          loading
+            ? null
+            : user
+              ? <Navigate to="/profile" replace />
+              : <Login />
+        }
       />
 
       <Route
         path="/register"
-        element={<Register />}
+        element={
+          loading
+            ? null
+            : user
+              ? <Navigate to="/profile" replace />
+              : <Register />
+        }
       />
 
       <Route

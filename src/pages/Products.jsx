@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
   Star
 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 import { getCategories } from "../api/categoryApi";
 import { getProducts } from "../api/productApi";
@@ -20,11 +21,12 @@ import { getProductReviewSummary } from "../utils/reviews";
 
 function Products() {
   const { t } = useContext(LanguageContext);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [categoryId, setCategoryId] = useState("all");
+  const search = searchParams.get("search") || "";
+  const categoryId = searchParams.get("category") || "all";
   const [minimumPrice, setMinimumPrice] = useState("");
   const [maximumPrice, setMaximumPrice] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -120,8 +122,12 @@ function Products() {
   ]);
 
   const resetFilters = () => {
-    setSearch("");
-    setCategoryId("all");
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams);
+      nextParams.delete("category");
+      nextParams.delete("search");
+      return nextParams;
+    }, { replace: true });
     setMinimumPrice("");
     setMaximumPrice("");
     setInStockOnly(false);
@@ -168,7 +174,21 @@ function Products() {
                 </span>
                 <select
                   value={categoryId}
-                  onChange={(event) => setCategoryId(event.target.value)}
+                  onChange={(event) => {
+                    const nextCategoryId = event.target.value;
+
+                    setSearchParams((currentParams) => {
+                      const nextParams = new URLSearchParams(currentParams);
+
+                      if (nextCategoryId === "all") {
+                        nextParams.delete("category");
+                      } else {
+                        nextParams.set("category", nextCategoryId);
+                      }
+
+                      return nextParams;
+                    }, { replace: true });
+                  }}
                   className="w-full rounded-xl border border-stone-300 px-3 py-2.5 text-sm outline-none focus:border-[#A98252] dark:border-stone-600"
                 >
                   <option value="all">{t("user.allCategories")}</option>
@@ -268,7 +288,21 @@ function Products() {
                 />
                 <input
                   value={search}
-                  onChange={(event) => setSearch(event.target.value)}
+                  onChange={(event) => {
+                    const nextSearch = event.target.value;
+
+                    setSearchParams((currentParams) => {
+                      const nextParams = new URLSearchParams(currentParams);
+
+                      if (nextSearch) {
+                        nextParams.set("search", nextSearch);
+                      } else {
+                        nextParams.delete("search");
+                      }
+
+                      return nextParams;
+                    }, { replace: true });
+                  }}
                   placeholder={t("user.searchProducts")}
                   className="w-full rounded-xl border border-stone-300 py-3 pl-11 pr-4 outline-none focus:border-[#A98252] dark:border-stone-600"
                 />

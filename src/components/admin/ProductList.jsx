@@ -1,4 +1,7 @@
 import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   Pencil,
   Trash2,
   Package
@@ -19,9 +22,32 @@ function ProductList({
   categories,
   onSubmit,
   onCancel,
-  submitting
+  submitting,
+  sortConfig,
+  onSort
 }) {
   const { t } = useContext(LanguageContext);
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+      return <ArrowUpDown size={14} />;
+    }
+
+    return sortConfig.direction === "asc"
+      ? <ArrowUp size={14} />
+      : <ArrowDown size={14} />;
+  };
+
+  const getSortLabel = (key) => {
+    if (sortConfig.key !== key) {
+      return t("admin.sortDefault");
+    }
+
+    return sortConfig.direction === "asc"
+      ? t("admin.sortLowestFirst")
+      : t("admin.sortHighestFirst");
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full">
@@ -35,12 +61,48 @@ function ProductList({
               {t("common.categories")}
             </th>
 
-            <th className="px-6 py-4 font-semibold">
-              {t("common.price")}
+            <th
+              className="px-6 py-4 font-semibold"
+              aria-sort={
+                sortConfig.key === "price"
+                  ? sortConfig.direction === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : "none"
+              }
+            >
+              <button
+                type="button"
+                onClick={() => onSort("price")}
+                className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-[#EDE6DC] hover:text-[#7A5A35] focus:outline-none focus:ring-2 focus:ring-[#A98252]/40 dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
+                title={getSortLabel("price")}
+                aria-label={`${t("common.price")}: ${getSortLabel("price")}`}
+              >
+                {t("common.price")}
+                {getSortIcon("price")}
+              </button>
             </th>
 
-            <th className="px-6 py-4 font-semibold">
-              {t("common.stock")}
+            <th
+              className="px-6 py-4 font-semibold"
+              aria-sort={
+                sortConfig.key === "stock"
+                  ? sortConfig.direction === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : "none"
+              }
+            >
+              <button
+                type="button"
+                onClick={() => onSort("stock")}
+                className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-[#EDE6DC] hover:text-[#7A5A35] focus:outline-none focus:ring-2 focus:ring-[#A98252]/40 dark:hover:bg-[#2B241F] dark:hover:text-[#C5A26B]"
+                title={getSortLabel("stock")}
+                aria-label={`${t("common.stock")}: ${getSortLabel("stock")}`}
+              >
+                {t("common.stock")}
+                {getSortIcon("stock")}
+              </button>
             </th>
 
             <th className="px-6 py-4 text-right font-semibold">
