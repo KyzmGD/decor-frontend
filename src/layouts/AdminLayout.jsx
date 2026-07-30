@@ -13,7 +13,8 @@ import {
   LayoutDashboard,
   LogOut,
   Package,
-  ShoppingCart
+  ShoppingCart,
+  UsersRound
 } from "lucide-react";
 
 import AuthContext
@@ -70,6 +71,14 @@ function AdminLayout({
         "common.orders"
       ),
       icon: ShoppingCart
+    },
+    {
+      to: "/admin/accounts",
+      label: t(
+        "admin.accountManagement",
+        "Quản lý tài khoản"
+      ),
+      icon: UsersRound
     }
   ];
 

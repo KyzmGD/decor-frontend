@@ -31,6 +31,9 @@ import AdminCategories
 import OrderManagement
   from "./pages/admin/OrderManagement";
 
+import AdminAccounts
+  from "./pages/admin/AdminAccounts";
+
 import PrivateRoute
   from "./components/PrivateRoute";
 
@@ -186,6 +189,18 @@ function App() {
             loading={loading}
           >
             <OrderManagement />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/accounts"
+        element={
+          <AdminRoute
+            user={user}
+            loading={loading}
+          >
+            <AdminAccounts />
           </AdminRoute>
         }
       />
