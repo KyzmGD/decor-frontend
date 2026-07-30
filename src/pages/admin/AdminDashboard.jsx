@@ -1,11 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 import { Link } from "react-router-dom";
 import {
   Package,
   FolderTree,
   ShoppingCart,
   DollarSign,
-  ArrowRight
+  ArrowRight,
+  UsersRound
 } from "lucide-react";
 
 import AdminLayout from "../../layouts/AdminLayout";
@@ -28,11 +34,7 @@ function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -55,7 +57,13 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    token
+  ]);
+
+  useEffect(() => {
+    Promise.resolve().then(loadDashboardData);
+  }, [loadDashboardData]);
 
   const revenue = useMemo(() => {
     return orders
@@ -119,6 +127,15 @@ function AdminDashboard() {
       description: t("admin.orderDescription"),
       to: "/admin/orders",
       icon: ShoppingCart
+    },
+    {
+      title: t("admin.accountManagement", "Quản lý tài khoản"),
+      description: t(
+        "admin.accountDescription",
+        "Theo dõi tài khoản người dùng, nhân viên và trạng thái truy cập"
+      ),
+      to: "/admin/accounts",
+      icon: UsersRound
     }
   ];
   return (
