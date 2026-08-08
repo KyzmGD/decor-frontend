@@ -1,10 +1,13 @@
-const usdFormatter = new Intl.NumberFormat("en-US", {
+const vndFormatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  currency: "VND",
+  maximumFractionDigits: 0
 });
 
 export function formatCurrency(value) {
-  return usdFormatter.format(Number(value || 0));
+  return vndFormatter.format(Number(value || 0));
+}
+
+export function formatVnd(value) {
+  return vndFormatter.format(Number(value || 0));
 }

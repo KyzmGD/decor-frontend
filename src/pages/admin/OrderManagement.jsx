@@ -14,10 +14,13 @@ import {
   ShoppingCart,
   RefreshCcw,
   Eye,
+  CreditCard,
   AlertTriangle,
   ShieldCheck,
   X
 } from "lucide-react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 import AuthContext from "../../context/AuthContext";
 import LanguageContext from "../../context/LanguageContext";
@@ -29,6 +32,7 @@ import {
   updateOrderStatus,
   confirmLowStockOrder
 } from "../../api/orderApi";
+import { confirmPayment } from "../../api/paymentApi";
 
 const ORDER_STATUSES = [
   "Pending",
@@ -70,7 +74,8 @@ const getLowStockItems = (order) =>
     });
 
 function OrderManagement() {
-  const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { token, logout } = useContext(AuthContext);
   const { t, language } = useContext(LanguageContext);
 
   const [orders, setOrders] = useState([]);
@@ -86,6 +91,7 @@ function OrderManagement() {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
+  const [confirmingPaymentId, setConfirmingPaymentId] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [error, setError] = useState("");
 
@@ -100,6 +106,13 @@ function OrderManagement() {
     } catch (error) {
       console.error("Load orders failed:", error);
 
+      if (error.response?.status === 401) {
+        toast.error(t("admin.sessionExpired"));
+        logout();
+        navigate("/login", { replace: true });
+        return;
+      }
+
       setError(
         error.response?.data?.message ||
         t("admin.loadOrdersError")
@@ -107,7 +120,7 @@ function OrderManagement() {
     } finally {
       setLoading(false);
     }
-  }, [t, token]);
+  }, [logout, navigate, t, token]);
 
   useEffect(() => {
     Promise.resolve().then(loadOrders);
@@ -309,6 +322,27 @@ function OrderManagement() {
       );
     } finally {
       setConfirmingId(null);
+    }
+  };
+
+  const handlePaymentConfirmation = async (payment) => {
+    if (!window.confirm(t("admin.confirmPaymentPrompt"))) {
+      return;
+    }
+
+    try {
+      setConfirmingPaymentId(payment.id);
+      await confirmPayment(payment.id, token);
+      toast.success(t("admin.paymentConfirmed"));
+      setSelectedOrder(null);
+      await loadOrders();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+        t("admin.confirmPaymentError")
+      );
+    } finally {
+      setConfirmingPaymentId(null);
     }
   };
 
@@ -611,6 +645,9 @@ function OrderManagement() {
                     order.status === "Pending" &&
                     order.requiresStockConfirmation &&
                     !order.stockConfirmed;
+                  const awaitingPayment =
+                    order.paymentMethod === "BANK_TRANSFER" &&
+                    order.paymentStatus !== "PAID";
 
                   const lowStockItems = getLowStockItems(order);
 
@@ -699,6 +736,11 @@ function OrderManagement() {
                         >
                           {getStatusLabel(order.status)}
                         </span>
+                        {order.paymentMethod === "BANK_TRANSFER" && (
+                          <p className={`mt-2 text-xs font-semibold ${awaitingPayment ? "text-amber-700" : "text-emerald-700"}`}>
+                            {t(`user.paymentStatus${order.paymentStatus || "PENDING"}`)}
+                          </p>
+                        )}
                       </td>
 
                       <td className="px-6 py-4 text-sm text-slate-600">
@@ -747,6 +789,9 @@ function OrderManagement() {
                                     !allowedNextStatuses.includes(status) ||
                                     (
                                       needsConfirmation &&
+                                      status === "Confirmed"
+                                    ) || (
+                                      awaitingPayment &&
                                       status === "Confirmed"
                                     )
                                   )
@@ -868,6 +913,58 @@ function OrderManagement() {
                       </p>
                     </div>
                   ))}
+                </div>
+              </section>
+
+              <section>
+                <h3 className="font-bold text-slate-900">
+                  {t("admin.paymentInformation")}
+                </h3>
+                <div className="mt-3 rounded-xl border border-slate-200 p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <CreditCard size={20} className="text-[#A98252]" />
+                      <div>
+                        <p className="font-semibold text-slate-900">
+                          {selectedOrder.paymentMethod === "BANK_TRANSFER"
+                            ? t("user.bankTransfer")
+                            : t("user.cashOnDelivery")}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {selectedOrder.paymentMethod === "BANK_TRANSFER"
+                            ? t(`user.paymentStatus${selectedOrder.paymentStatus || "PENDING"}`)
+                            : t("admin.noOnlinePaymentRequired")}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedOrder.transactions?.[0]?.status === "PENDING" &&
+                      selectedOrder.status !== "Cancelled" && (
+                        <button
+                          type="button"
+                          disabled={confirmingPaymentId === selectedOrder.transactions[0].id}
+                          onClick={() => handlePaymentConfirmation(selectedOrder.transactions[0])}
+                          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-50"
+                        >
+                          {confirmingPaymentId === selectedOrder.transactions[0].id
+                            ? t("common.loading")
+                            : t("admin.markAsPaid")}
+                        </button>
+                      )}
+                  </div>
+                  {selectedOrder.transactions?.[0] && (
+                    <dl className="mt-4 grid gap-3 border-t border-slate-200 pt-4 text-sm sm:grid-cols-2">
+                      <div>
+                        <dt className="text-slate-500">{t("user.transferContent")}</dt>
+                        <dd className="mt-1 font-semibold">{selectedOrder.transactions[0].transferContent}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">{t("user.transferAmount")}</dt>
+                        <dd className="mt-1 font-semibold">
+                          {Number(selectedOrder.transactions[0].transferAmountVnd).toLocaleString("vi-VN")} VND
+                        </dd>
+                      </div>
+                    </dl>
+                  )}
                 </div>
               </section>
 

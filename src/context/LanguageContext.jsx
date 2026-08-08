@@ -35,7 +35,7 @@ const translations = {
       actions: "Thao tác",
       name: "Tên",
       description: "Mô tả",
-      price: "Giá",
+      price: "Giá (VND)",
       stock: "Tồn kho",
       loading: "Đang tải...",
       noData: "Không có dữ liệu",
@@ -52,6 +52,16 @@ const translations = {
       imageUrl: "Đường dẫn hình ảnh", create: "Tạo mới", update: "Cập nhật",
       noDescription: "Không có mô tả", uncategorized: "Chưa phân loại",
       wishlist: "Yêu thích"
+      ,transactions: "Giao dịch"
+    },
+
+    footer: {
+      description: "Nội thất tinh tế cho không gian sống hiện đại.",
+      contactInformation: "Thông tin liên hệ",
+      address: "XQMF+83 Hà Đông, Hà Nội, Việt Nam",
+      explore: "Liên kết nhanh",
+      navigation: "Điều hướng cuối trang",
+      rightsReserved: "Đã đăng ký bản quyền."
     },
 
     admin: {
@@ -65,6 +75,20 @@ const translations = {
       totalCategories: "Danh mục",
       totalOrders: "Đơn hàng",
       revenue: "Doanh thu",
+      revenuePeriod: "Doanh thu",
+      dateFrom: "Từ ngày",
+      dateTo: "Đến ngày",
+      allTime: "Toàn bộ thời gian",
+      soldByCategory: "Tỷ lệ sản phẩm đã bán theo danh mục",
+      soldByCategoryDescription:
+        "Tỷ lệ được tính theo số lượng sản phẩm trong đơn hàng hoàn thành.",
+      productsSold: "Sản phẩm đã bán",
+      productsSoldUnit: "sản phẩm",
+      soldQuantity: "Số lượng đã bán",
+      categorySalesDetails: "Chi tiết sản phẩm đã bán",
+      selectCategoryHint: "Chọn một danh mục trên biểu đồ để xem chi tiết.",
+      noSalesData: "Không có sản phẩm đã bán trong khoảng thời gian này.",
+      chartAriaLabel: "Biểu đồ tỷ lệ sản phẩm đã bán theo danh mục",
 
       storeManagement:
         "Quản lý cửa hàng",
@@ -110,6 +134,37 @@ const translations = {
 
       orderManagement:
         "Quản lý đơn hàng",
+
+      accountManagement:
+        "Quản lý tài khoản",
+
+      accountDescription:
+        "Xem tài khoản đã đăng ký và quản lý quyền quản trị viên",
+
+      searchAccount:
+        "Tìm theo tên, email hoặc quyền...",
+
+      accountList: "Danh sách tài khoản",
+      accountCount: "{count} tài khoản",
+      loadingAccounts: "Đang tải tài khoản...",
+      account: "Tài khoản",
+      accountInformation: "Thông tin tài khoản",
+      contactInformation: "Thông tin liên hệ",
+      registeredAt: "Ngày đăng ký",
+      lastLogin: "Đăng nhập gần nhất",
+      neverLoggedIn: "Chưa từng đăng nhập",
+      viewAccount: "Xem tài khoản",
+      permission: "Quyền truy cập",
+      permissionDescription:
+        "Chọn tài khoản này có quyền người dùng hay quản trị viên.",
+      savePermission: "Lưu quyền",
+      permissionUpdated: "Đã cập nhật quyền thành công.",
+      loadAccountsError: "Không thể tải danh sách tài khoản.",
+      updatePermissionError: "Không thể cập nhật quyền.",
+      userRole: "Người dùng",
+      adminRole: "Quản trị viên",
+      sessionExpired:
+        "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
 
       orderDescription:
         "Theo dõi và cập nhật trạng thái đơn hàng",
@@ -218,6 +273,12 @@ const translations = {
       orderedProducts: "Sản phẩm đã đặt",
       confirmLowStockPrompt: "Sản phẩm đang có tồn kho thấp. Bạn xác nhận vẫn xử lý đơn hàng này?",
       confirmLowStockError: "Không thể xác nhận đơn hàng tồn kho thấp."
+      ,paymentInformation: "Thông tin thanh toán",
+      noOnlinePaymentRequired: "Không yêu cầu thanh toán trực tuyến",
+      markAsPaid: "Xác nhận đã thanh toán",
+      confirmPaymentPrompt: "Bạn xác nhận đã nhận đủ khoản chuyển tiền này?",
+      paymentConfirmed: "Đã xác nhận thanh toán",
+      confirmPaymentError: "Không thể xác nhận thanh toán"
     },
 
     user: {
@@ -245,6 +306,11 @@ const translations = {
 
       myOrders:
         "Đơn hàng của tôi",
+      orderStatusHistory: "Lịch sử trạng thái",
+      orderStatusHistoryDescription:
+        "Theo dõi thời điểm đơn hàng chuyển sang từng trạng thái.",
+      showStatusHistory: "Xem toàn bộ lịch sử",
+      hideStatusHistory: "Thu gọn lịch sử",
 
       emptyCart:
         "Giỏ hàng đang trống",
@@ -287,10 +353,6 @@ const translations = {
       newArrivals: "Mới về",
       browseBy: "Khám phá theo",
       categoryIntro: "Tìm những món nội thất phù hợp cho từng không gian sống.",
-      newsletterTitle: "Đăng ký bản tin",
-      newsletterDescription: "Nhận cảm hứng thiết kế, bộ sưu tập mới và ưu đãi đặc biệt từ Woodora.",
-      subscribe: "Đăng ký",
-      newsletterSuccess: "Đăng ký nhận bản tin thành công",
       loginToContinue: "Vui lòng đăng nhập để tiếp tục",
       outOfStock: "Hết hàng",
       decreaseQuantity: "Giảm số lượng",
@@ -303,6 +365,10 @@ const translations = {
       submitReview: "Gửi đánh giá",
       noReviews: "Chưa có đánh giá nào cho sản phẩm này.",
       reviewSuccess: "Gửi đánh giá thành công",
+      deleteReview: "Xóa đánh giá",
+      deleteReviewPrompt: "Bạn có chắc muốn xóa đánh giá này?",
+      reviewDeleted: "Đã xóa đánh giá",
+      deleteReviewError: "Không thể xóa đánh giá",
       relatedProducts: "Sản phẩm tương tự",
       subtotal: "Tạm tính",
       shipping: "Vận chuyển",
@@ -326,7 +392,32 @@ const translations = {
       paymentMethod: "Phương thức thanh toán",
       cashOnDelivery: "Thanh toán khi nhận hàng (COD)",
       bankTransfer: "Chuyển khoản ngân hàng",
-      bankTransferInstruction: "Thông tin chuyển khoản sẽ được gửi qua email sau khi đặt hàng. Vui lòng sử dụng mã đơn làm nội dung chuyển khoản.",
+      bankTransferInstruction: "Sau khi đặt hàng, hệ thống sẽ tạo mã QR, số tiền VND và nội dung chuyển khoản riêng cho đơn của bạn.",
+      bankTransferCreated: "Đơn hàng đã được tạo. Vui lòng hoàn tất chuyển khoản.",
+      transactionHistory: "Lịch sử giao dịch",
+      transactionHistoryDescription: "Theo dõi và hoàn tất các giao dịch chuyển khoản ngân hàng của bạn.",
+      noTransactions: "Bạn chưa có giao dịch chuyển khoản nào.",
+      loadTransactionsError: "Không thể tải lịch sử giao dịch.",
+      receivingBank: "Ngân hàng nhận",
+      accountNumber: "Số tài khoản",
+      accountHolder: "Chủ tài khoản",
+      transferContent: "Nội dung chuyển khoản",
+      transferAmount: "Số tiền cần chuyển",
+      waitingForPayment: "Đang chờ nhận thanh toán",
+      paymentAutoUpdate: "Trạng thái sẽ tự động cập nhật sau khi ngân hàng xác nhận.",
+      paymentQrAlt: "Mã QR chuyển khoản ngân hàng",
+      scanQrInstruction: "Quét bằng ứng dụng ngân hàng để thanh toán",
+      paidAt: "Thanh toán lúc",
+      copy: "Sao chép",
+      copied: "Đã sao chép",
+      paymentStatusPENDING: "Chờ thanh toán",
+      paymentStatusPAID: "Đã thanh toán",
+      paymentStatusFAILED: "Thất bại",
+      paymentStatusCANCELLED: "Đã hủy",
+      paymentStatusREFUNDED: "Đã hoàn tiền",
+      paymentAmountExact: "Số tiền chính xác",
+      paymentInformation: "Thông tin thanh toán",
+      viewPaymentDetails: "Xem chi tiết thanh toán",
       orderNote: "Ghi chú đơn hàng",
       orderNotePlaceholder: "Ghi chú cho người giao hàng...",
       checkoutError: "Không thể hoàn tất đơn hàng. Vui lòng thử lại.",
@@ -368,7 +459,7 @@ const translations = {
       confirmReceivedError: "Không thể xác nhận đã nhận hàng",
       filters: "Bộ lọc",
       resetFilters: "Đặt lại bộ lọc",
-      priceRange: "Khoảng giá (USD)",
+      priceRange: "Khoảng giá (VND)",
       minimum: "Từ",
       maximum: "Đến",
       minimumRating: "Đánh giá tối thiểu",
@@ -404,7 +495,7 @@ const translations = {
       actions: "Actions",
       name: "Name",
       description: "Description",
-      price: "Price",
+      price: "Price (VND)",
       stock: "Stock",
       loading: "Loading...",
       noData: "No data",
@@ -421,6 +512,16 @@ const translations = {
       imageUrl: "Image URL", create: "Create", update: "Update",
       noDescription: "No description", uncategorized: "Uncategorized",
       wishlist: "Wishlist"
+      ,transactions: "Transactions"
+    },
+
+    footer: {
+      description: "Refined furniture for modern living spaces.",
+      contactInformation: "Contact information",
+      address: "XQMF+83 Ha Dong, Hanoi, Vietnam",
+      explore: "Quick links",
+      navigation: "Footer navigation",
+      rightsReserved: "All rights reserved."
     },
 
     admin: {
@@ -441,6 +542,20 @@ const translations = {
 
       revenue:
         "Revenue",
+      revenuePeriod: "Revenue",
+      dateFrom: "From",
+      dateTo: "To",
+      allTime: "All time",
+      soldByCategory: "Products sold by category",
+      soldByCategoryDescription:
+        "Percentages are based on product quantities in completed orders.",
+      productsSold: "Products sold",
+      productsSoldUnit: "products",
+      soldQuantity: "Quantity sold",
+      categorySalesDetails: "Sold product details",
+      selectCategoryHint: "Select a category in the chart to view details.",
+      noSalesData: "No products were sold during this date range.",
+      chartAriaLabel: "Products sold by category pie chart",
 
       storeManagement:
         "Store management",
@@ -486,6 +601,37 @@ const translations = {
 
       orderManagement:
         "Order management",
+
+      accountManagement:
+        "Account management",
+
+      accountDescription:
+        "View registered accounts and manage administrator access",
+
+      searchAccount:
+        "Search by name, email or role...",
+
+      accountList: "Account list",
+      accountCount: "{count} accounts",
+      loadingAccounts: "Loading accounts...",
+      account: "Account",
+      accountInformation: "Account information",
+      contactInformation: "Contact information",
+      registeredAt: "Registered at",
+      lastLogin: "Last login",
+      neverLoggedIn: "Never logged in",
+      viewAccount: "View account",
+      permission: "Permission",
+      permissionDescription:
+        "Choose whether this account has user or administrator access.",
+      savePermission: "Save permission",
+      permissionUpdated: "Permission updated successfully.",
+      loadAccountsError: "Could not load accounts.",
+      updatePermissionError: "Could not update permission.",
+      userRole: "User",
+      adminRole: "Admin",
+      sessionExpired:
+        "Your session has expired. Please sign in again.",
 
       orderDescription:
         "Track and update order statuses",
@@ -603,6 +749,12 @@ const translations = {
       orderedProducts: "Ordered products",
       confirmLowStockPrompt: "Some products have low stock. Do you want to confirm and process this order?",
       confirmLowStockError: "Unable to confirm the low-stock order."
+      ,paymentInformation: "Payment information",
+      noOnlinePaymentRequired: "No online payment required",
+      markAsPaid: "Mark as paid",
+      confirmPaymentPrompt: "Have you received the full amount for this payment?",
+      paymentConfirmed: "Payment confirmed",
+      confirmPaymentError: "Unable to confirm payment"
     },
 
     user: {
@@ -630,6 +782,11 @@ const translations = {
 
       myOrders:
         "My orders",
+      orderStatusHistory: "Status history",
+      orderStatusHistoryDescription:
+        "Track when your order moved to each status.",
+      showStatusHistory: "Show full history",
+      hideStatusHistory: "Collapse history",
 
       emptyCart:
         "Your cart is empty",
@@ -672,10 +829,6 @@ const translations = {
       newArrivals: "New arrivals",
       browseBy: "Browse by",
       categoryIntro: "Find considered furniture for every room and way of living.",
-      newsletterTitle: "Join our newsletter",
-      newsletterDescription: "Receive design inspiration, new collections and exclusive offers from Woodora.",
-      subscribe: "Subscribe",
-      newsletterSuccess: "Newsletter subscription successful",
       loginToContinue: "Please log in to continue",
       outOfStock: "Out of stock",
       decreaseQuantity: "Decrease quantity",
@@ -688,6 +841,10 @@ const translations = {
       submitReview: "Submit review",
       noReviews: "There are no reviews for this product yet.",
       reviewSuccess: "Review submitted successfully",
+      deleteReview: "Delete review",
+      deleteReviewPrompt: "Are you sure you want to delete this review?",
+      reviewDeleted: "Review deleted",
+      deleteReviewError: "Unable to delete review",
       relatedProducts: "Related products",
       subtotal: "Subtotal",
       shipping: "Shipping",
@@ -711,7 +868,32 @@ const translations = {
       paymentMethod: "Payment method",
       cashOnDelivery: "Cash on delivery (COD)",
       bankTransfer: "Bank transfer",
-      bankTransferInstruction: "Bank details will be sent by email after checkout. Please use your order number as the payment reference.",
+      bankTransferInstruction: "After placing your order, the system will generate a QR code, an exact VND amount and a unique transfer reference.",
+      bankTransferCreated: "Your order is ready. Please complete the bank transfer.",
+      transactionHistory: "Transaction history",
+      transactionHistoryDescription: "Track and complete your bank transfer payments.",
+      noTransactions: "You do not have any bank transfer transactions yet.",
+      loadTransactionsError: "Unable to load transaction history.",
+      receivingBank: "Receiving bank",
+      accountNumber: "Account number",
+      accountHolder: "Account holder",
+      transferContent: "Transfer reference",
+      transferAmount: "Amount to transfer",
+      waitingForPayment: "Waiting for payment",
+      paymentAutoUpdate: "The status will update automatically after bank confirmation.",
+      paymentQrAlt: "Bank transfer QR code",
+      scanQrInstruction: "Scan with your banking app to pay",
+      paidAt: "Paid at",
+      copy: "Copy",
+      copied: "Copied",
+      paymentStatusPENDING: "Pending payment",
+      paymentStatusPAID: "Paid",
+      paymentStatusFAILED: "Failed",
+      paymentStatusCANCELLED: "Cancelled",
+      paymentStatusREFUNDED: "Refunded",
+      paymentAmountExact: "Exact amount",
+      paymentInformation: "Payment information",
+      viewPaymentDetails: "View payment details",
       orderNote: "Order note",
       orderNotePlaceholder: "Notes for the delivery team...",
       checkoutError: "Unable to complete your order. Please try again.",
@@ -753,7 +935,7 @@ const translations = {
       confirmReceivedError: "Unable to confirm order receipt",
       filters: "Filters",
       resetFilters: "Reset filters",
-      priceRange: "Price range (USD)",
+      priceRange: "Price range (VND)",
       minimum: "Min",
       maximum: "Max",
       minimumRating: "Minimum rating",

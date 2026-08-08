@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout";
 import MyOrders from "./pages/MyOrders";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
+import TransactionHistory from "./pages/TransactionHistory";
 
 import AdminDashboard
   from "./pages/admin/AdminDashboard";
@@ -141,6 +142,18 @@ function App() {
             loading={loading}
           >
             <MyOrders />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/transactions"
+        element={
+          <PrivateRoute
+            user={user}
+            loading={loading}
+          >
+            <TransactionHistory />
           </PrivateRoute>
         }
       />

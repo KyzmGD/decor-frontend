@@ -208,6 +208,7 @@ function Products() {
                   <input
                     type="number"
                     min="0"
+                    step="100000"
                     value={minimumPrice}
                     onChange={(event) => setMinimumPrice(event.target.value)}
                     placeholder={t("user.minimum")}
@@ -216,6 +217,7 @@ function Products() {
                   <input
                     type="number"
                     min="0"
+                    step="100000"
                     value={maximumPrice}
                     onChange={(event) => setMaximumPrice(event.target.value)}
                     placeholder={t("user.maximum")}

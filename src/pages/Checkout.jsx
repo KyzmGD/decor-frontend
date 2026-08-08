@@ -18,6 +18,7 @@ import AuthContext from "../context/AuthContext";
 import CartContext from "../context/CartContext";
 import LanguageContext from "../context/LanguageContext";
 import MainLayout from "../layouts/MainLayout";
+import { formatCurrency } from "../utils/currency";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ function Checkout() {
   const discount =
     coupon === "WOODORA10" ? subtotal * 0.1 : 0;
   const shippingFee =
-    shippingMethod === "EXPRESS" ? 15 : 0;
+    shippingMethod === "EXPRESS" ? 390000 : 0;
   const total = subtotal - discount + shippingFee;
 
   const updateField = (event) => {
@@ -77,7 +78,7 @@ function Checkout() {
     try {
       setLoading(true);
 
-      await createOrder(
+      const response = await createOrder(
         {
           items: cartItems,
           totalPrice: total,
@@ -100,8 +101,19 @@ function Checkout() {
 
       clearCart();
       localStorage.removeItem("checkoutCoupon");
-      toast.success(t("user.orderSuccess"));
-      navigate("/my-orders");
+
+      if (paymentMethod === "BANK_TRANSFER") {
+        const transaction = response.data.transactions?.[0];
+        toast.success(t("user.bankTransferCreated"));
+        navigate(
+          transaction
+            ? `/transactions?transaction=${transaction.id}`
+            : "/transactions"
+        );
+      } else {
+        toast.success(t("user.orderSuccess"));
+        navigate("/my-orders");
+      }
     } catch (error) {
       console.error("Create order failed:", error);
       toast.error(
@@ -233,7 +245,7 @@ function Checkout() {
                   value: "EXPRESS",
                   label: t("user.expressShipping"),
                   detail: t("user.expressShippingDetail"),
-                  price: "$15.00"
+                  price: formatCurrency(390000)
                 }
               ].map((method) => (
                 <label
@@ -319,7 +331,21 @@ function Checkout() {
 
             {paymentMethod === "BANK_TRANSFER" && (
               <div className="mt-4 rounded-xl bg-stone-50 p-4 text-sm leading-6 dark:bg-stone-800">
-                {t("user.bankTransferInstruction")}
+                <p>{t("user.bankTransferInstruction")}</p>
+                <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-stone-500">{t("user.receivingBank")}</dt>
+                    <dd className="font-semibold">VietinBank</dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone-500">{t("user.accountNumber")}</dt>
+                    <dd className="font-semibold">100844608386</dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-stone-500">{t("user.accountHolder")}</dt>
+                    <dd className="font-semibold">NGUYEN NGOC TUAN LINH</dd>
+                  </div>
+                </dl>
               </div>
             )}
           </section>
@@ -355,7 +381,7 @@ function Checkout() {
                   </p>
                 </div>
                 <p className="text-sm font-semibold">
-                  ${(Number(item.price) * item.quantity).toFixed(2)}
+                  {formatCurrency(Number(item.price) * item.quantity)}
                 </p>
               </div>
             ))}
@@ -364,22 +390,22 @@ function Checkout() {
           <dl className="mt-6 space-y-3 border-t border-stone-200 pt-5 text-sm dark:border-stone-700">
             <div className="flex justify-between">
               <dt className="text-stone-500">{t("user.subtotal")}</dt>
-              <dd>${subtotal.toFixed(2)}</dd>
+              <dd>{formatCurrency(subtotal)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-stone-500">{t("user.shipping")}</dt>
-              <dd>${shippingFee.toFixed(2)}</dd>
+              <dd>{formatCurrency(shippingFee)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-stone-500">{t("user.discount")}</dt>
-              <dd>-${discount.toFixed(2)}</dd>
+              <dd>-{formatCurrency(discount)}</dd>
             </div>
           </dl>
 
           <div className="mt-5 flex items-center justify-between border-t border-stone-200 pt-5 dark:border-stone-700">
             <span className="font-bold">{t("common.total")}</span>
             <span className="text-2xl font-bold text-[#A98252]">
-              ${total.toFixed(2)}
+              {formatCurrency(total)}
             </span>
           </div>
 

@@ -42,7 +42,7 @@ ReactDOM.createRoot(
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
-                <Toaster />
+                <Toaster position="bottom-center" />
                 <App />
               </WishlistProvider>
             </CartProvider>

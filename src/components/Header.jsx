@@ -253,16 +253,20 @@ function Header() {
           </NavLink>
 
           {user && (
-            <NavLink
-              to="/my-orders"
-              className={
-                navClass
-              }
-            >
-              {t(
-                "common.orders"
-              )}
-            </NavLink>
+            <>
+              <NavLink
+                to="/my-orders"
+                className={navClass}
+              >
+                {t("common.orders")}
+              </NavLink>
+              <NavLink
+                to="/transactions"
+                className={navClass}
+              >
+                {t("common.transactions")}
+              </NavLink>
+            </>
           )}
         </nav>
 

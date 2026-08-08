@@ -211,7 +211,7 @@ function ProductForm({
             required
             type="number"
             min="0"
-            step="0.01"
+            step="1000"
             value={form.price}
             onChange={(event) => updateField("price", event.target.value)}
             className={inputClasses}

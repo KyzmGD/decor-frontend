@@ -7,10 +7,8 @@ import {
 import {
   ArrowRight,
   ChevronLeft,
-  ChevronRight,
-  Mail
+  ChevronRight
 } from "lucide-react";
-import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 import { getProducts } from "../api/productApi";
@@ -23,7 +21,6 @@ function Home() {
   const { t } = useContext(LanguageContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentProductPage, setCurrentProductPage] = useState(0);
   const [carouselPaused, setCarouselPaused] = useState(false);
@@ -99,17 +96,6 @@ function Home() {
       (currentPage) =>
         (currentPage + 1) % allProductPages.length
     );
-  };
-
-  const handleNewsletter = (event) => {
-    event.preventDefault();
-
-    if (!email.trim()) {
-      return;
-    }
-
-    toast.success(t("user.newsletterSuccess"));
-    setEmail("");
   };
 
   return (
@@ -383,37 +369,6 @@ function Home() {
         </section>
       </div>
 
-      <section className="border-y border-stone-200 bg-[#EDE6DC] px-6 py-16 text-center dark:border-stone-700 dark:bg-[#211C18]">
-        <Mail
-          size={28}
-          className="mx-auto text-[#A98252]"
-        />
-        <h2 className="mt-4 text-3xl font-bold">
-          {t("user.newsletterTitle")}
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-stone-600 dark:text-stone-300">
-          {t("user.newsletterDescription")}
-        </p>
-        <form
-          onSubmit={handleNewsletter}
-          className="mx-auto mt-7 flex max-w-lg flex-col gap-3 sm:flex-row"
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder={t("common.email")}
-            required
-            className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-5 py-3 outline-none focus:border-[#A98252] dark:border-stone-600 dark:bg-stone-900"
-          />
-          <button
-            type="submit"
-            className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800"
-          >
-            {t("user.subscribe")}
-          </button>
-        </form>
-      </section>
     </MainLayout>
   );
 }

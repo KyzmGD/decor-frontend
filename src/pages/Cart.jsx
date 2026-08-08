@@ -3,7 +3,6 @@ import {
   useState
 } from "react";
 import {
-  Mail,
   Minus,
   Plus,
   ShoppingBag,
@@ -18,6 +17,7 @@ import {
 import CartContext from "../context/CartContext";
 import LanguageContext from "../context/LanguageContext";
 import MainLayout from "../layouts/MainLayout";
+import { formatCurrency } from "../utils/currency";
 
 function Cart() {
   const navigate = useNavigate();
@@ -34,7 +34,6 @@ function Cart() {
   const [appliedCoupon, setAppliedCoupon] = useState(
     localStorage.getItem("checkoutCoupon") || ""
   );
-  const [email, setEmail] = useState("");
 
   const subtotal = cartItems.reduce(
     (sum, item) =>
@@ -67,12 +66,6 @@ function Cart() {
     }
 
     navigate("/checkout");
-  };
-
-  const handleNewsletter = (event) => {
-    event.preventDefault();
-    toast.success(t("user.newsletterSuccess"));
-    setEmail("");
   };
 
   return (
@@ -177,10 +170,10 @@ function Cart() {
                       </div>
                     </div>
                     <p className="font-medium">
-                      ${Number(item.price).toFixed(2)}
+                      {formatCurrency(item.price)}
                     </p>
                     <p className="font-bold text-[#A98252]">
-                      ${(Number(item.price) * item.quantity).toFixed(2)}
+                      {formatCurrency(Number(item.price) * item.quantity)}
                     </p>
                     <button
                       type="button"
@@ -202,7 +195,7 @@ function Cart() {
               <dl className="mt-6 space-y-4 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-stone-500">{t("user.subtotal")}</dt>
-                  <dd className="font-semibold">${subtotal.toFixed(2)}</dd>
+                  <dd className="font-semibold">{formatCurrency(subtotal)}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-stone-500">{t("user.shipping")}</dt>
@@ -210,7 +203,7 @@ function Cart() {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-stone-500">{t("user.discount")}</dt>
-                  <dd>-${discount.toFixed(2)}</dd>
+                  <dd>-{formatCurrency(discount)}</dd>
                 </div>
               </dl>
 
@@ -233,7 +226,7 @@ function Cart() {
               <div className="mt-6 flex items-center justify-between border-t border-stone-200 pt-5 dark:border-stone-700">
                 <span className="font-bold">{t("common.total")}</span>
                 <span className="text-2xl font-bold text-[#A98252]">
-                  ${total.toFixed(2)}
+                  {formatCurrency(total)}
                 </span>
               </div>
               <button
@@ -248,28 +241,6 @@ function Cart() {
         )}
       </div>
 
-      <section className="border-y border-stone-200 bg-[#EDE6DC] px-6 py-14 text-center dark:border-stone-700 dark:bg-[#211C18]">
-        <Mail size={27} className="mx-auto text-[#A98252]" />
-        <h2 className="mt-4 text-3xl font-bold">
-          {t("user.newsletterTitle")}
-        </h2>
-        <form
-          onSubmit={handleNewsletter}
-          className="mx-auto mt-6 flex max-w-lg flex-col gap-3 sm:flex-row"
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder={t("common.email")}
-            required
-            className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-5 py-3 dark:border-stone-600 dark:bg-stone-900"
-          />
-          <button className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white">
-            {t("user.subscribe")}
-          </button>
-        </form>
-      </section>
     </MainLayout>
   );
 }

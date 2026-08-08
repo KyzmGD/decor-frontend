@@ -10,10 +10,10 @@ import {
   ChevronRight,
   ChevronUp,
   Heart,
-  Mail,
   Minus,
   Plus,
-  Star
+  Star,
+  Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -28,7 +28,8 @@ import {
 } from "../api/productApi";
 import {
   getReviews,
-  createReview
+  createReview,
+  deleteReview
 } from "../api/reviewApi";
 import AuthContext from "../context/AuthContext";
 import CartContext from "../context/CartContext";
@@ -57,7 +58,7 @@ function ProductDetail() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [reviews, setReviews] = useState([]);
-  const [email, setEmail] = useState("");
+  const [deletingReviewId, setDeletingReviewId] = useState(null);
   const [thumbnailPage, setThumbnailPage] = useState(0);
 
   useEffect(() => {
@@ -164,6 +165,10 @@ function ProductDetail() {
   const stock = Math.max(Number(product.stock || 0), 0);
   const isFavorite =
     Boolean(user) && isInWishlist(product.id);
+  const categoryName =
+    product.Category?.name ||
+    product.category?.name ||
+    t("common.uncategorized");
 
   const requireLogin = () => {
     if (user) {
@@ -229,10 +234,23 @@ function ProductDetail() {
     }
   };
 
-  const handleNewsletter = (event) => {
-    event.preventDefault();
-    toast.success(t("user.newsletterSuccess"));
-    setEmail("");
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm(t("user.deleteReviewPrompt"))) return;
+
+    try {
+      setDeletingReviewId(reviewId);
+      await deleteReview(reviewId, token);
+      setReviews((current) =>
+        current.filter((review) => review.id !== reviewId)
+      );
+      toast.success(t("user.reviewDeleted"));
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || t("user.deleteReviewError")
+      );
+    } finally {
+      setDeletingReviewId(null);
+    }
   };
 
   return (
@@ -243,7 +261,21 @@ function ProductDetail() {
           <span>/</span>
           <Link to="/products">{t("common.products")}</Link>
           <span>/</span>
-          <span className="text-stone-900 dark:text-stone-100">
+          {product.categoryId ? (
+            <Link
+              to={`/products?category=${encodeURIComponent(product.categoryId)}`}
+              className="transition-colors hover:text-[#A98252]"
+            >
+              {categoryName}
+            </Link>
+          ) : (
+            <span>{categoryName}</span>
+          )}
+          <span>/</span>
+          <span
+            aria-current="page"
+            className="text-stone-900 dark:text-stone-100"
+          >
             {product.name}
           </span>
         </nav>
@@ -569,14 +601,30 @@ function ProductDetail() {
                 >
                   <div className="flex items-center justify-between gap-4">
                     <p className="font-semibold">{review.name}</p>
-                    <div className="flex text-[#A98252]">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          size={15}
-                          fill={star <= review.rating ? "currentColor" : "none"}
-                        />
-                      ))}
+                    <div className="flex items-center gap-3">
+                      <div className="flex text-[#A98252]">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={15}
+                            fill={star <= review.rating ? "currentColor" : "none"}
+                          />
+                        ))}
+                      </div>
+                      {user &&
+                        (user.role === "admin" ||
+                          Number(review.userId) === Number(user.id)) && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteReview(review.id)}
+                            disabled={deletingReviewId === review.id}
+                            title={t("user.deleteReview")}
+                            aria-label={`${t("user.deleteReview")} ${review.name}`}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 transition hover:bg-red-50 hover:text-red-700 disabled:opacity-50 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
                     </div>
                   </div>
                   <p className="mt-3 text-stone-600 dark:text-stone-300">
@@ -612,31 +660,6 @@ function ProductDetail() {
         )}
       </div>
 
-      <section className="border-y border-stone-200 bg-[#EDE6DC] px-6 py-14 text-center dark:border-stone-700 dark:bg-[#211C18]">
-        <Mail size={27} className="mx-auto text-[#A98252]" />
-        <h2 className="mt-4 text-3xl font-bold">
-          {t("user.newsletterTitle")}
-        </h2>
-        <form
-          onSubmit={handleNewsletter}
-          className="mx-auto mt-6 flex max-w-lg flex-col gap-3 sm:flex-row"
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder={t("common.email")}
-            required
-            className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-5 py-3 outline-none dark:border-stone-600 dark:bg-stone-900"
-          />
-          <button
-            type="submit"
-            className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white"
-          >
-            {t("user.subscribe")}
-          </button>
-        </form>
-      </section>
     </MainLayout>
   );
 }

@@ -11,3 +11,8 @@ export const createReview = (productId, data, token) =>
   axios.post(`${BASE}/${productId}/reviews`, data, {
     headers: { Authorization: `Bearer ${token}` }
   });
+
+export const deleteReview = (reviewId, token) =>
+  axios.delete(`${BASE}/${reviewId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
